@@ -17,7 +17,7 @@
 import React, { useState } from 'react';
 import { Navigation } from './Navigation/Navigation';
 import { makeStyles } from '@material-ui/core';
-import { HiddenAppBar } from './HiddenAppBar';
+import { HiddenAppBar } from './Header/HiddenAppBar';
 import { Header } from './Header/Header';
 
 export const AppWrapper: React.FC = ({ children }) => {

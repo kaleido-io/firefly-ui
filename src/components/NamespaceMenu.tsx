@@ -16,8 +16,8 @@
 
 import React, { useContext } from 'react';
 import { TextField, MenuItem, makeStyles } from '@material-ui/core';
-import { NamespaceContext } from '../../contexts/NamespaceContext';
-import { NAMESPACE_LOCALSTORAGE_KEY } from '../../App';
+import { NamespaceContext } from '../contexts/NamespaceContext';
+import { NAMESPACE_LOCALSTORAGE_KEY } from '../App';
 
 export const NamespaceMenu: React.FC = () => {
   const classes = useStyles();

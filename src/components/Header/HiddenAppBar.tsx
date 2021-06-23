@@ -17,8 +17,9 @@
 import React from 'react';
 import { IconButton, Hidden, makeStyles, Box } from '@material-ui/core';
 import MenuIcon from 'mdi-react/MenuIcon';
-import { ReactComponent as LogoIconSVG } from '../svg/ff-logo-symbol-white.svg';
-import { NamespaceMenu } from './Header/NamespaceMenu';
+import { ReactComponent as LogoIconSVG } from '../../svg/ff-logo-symbol-white.svg';
+import { NamespaceMenu } from '../NamespaceMenu';
+import { DatePicker } from '../DatePicker';
 
 type Props = {
   navigationOpen: boolean;
@@ -44,8 +45,13 @@ export const HiddenAppBar: React.FC<Props> = ({
           </IconButton>
           <LogoIconSVG className={classes.logo} />
         </div>
-        <div>
-          <NamespaceMenu />
+        <div className={classes.item}>
+          <div className={classes.paddingRight}>
+            <DatePicker />
+          </div>
+          <div>
+            <NamespaceMenu />
+          </div>
         </div>
       </Box>
     </Hidden>
@@ -63,6 +69,9 @@ const useStyles = makeStyles((theme) => ({
   item: {
     display: 'flex',
     alignItems: 'center',
+  },
+  paddingRight: {
+    paddingRight: theme.spacing(2),
   },
   navIcon: {
     color: theme.palette.text.primary,

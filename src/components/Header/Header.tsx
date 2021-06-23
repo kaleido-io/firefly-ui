@@ -16,7 +16,8 @@
 
 import React from 'react';
 import { Grid, Hidden, makeStyles } from '@material-ui/core';
-import { NamespaceMenu } from './NamespaceMenu';
+import { DatePicker } from '../DatePicker';
+import { NamespaceMenu } from '../NamespaceMenu';
 
 export const Header: React.FC = () => {
   const classes = useStyles();
@@ -24,7 +25,10 @@ export const Header: React.FC = () => {
   return (
     <Hidden implementation="js" smDown>
       <header className={classes.headerGrid}>
-        <Grid container alignItems="center" justify="flex-end">
+        <Grid container spacing={2} alignItems="center" justify="flex-end">
+          <Grid item>
+            <DatePicker />
+          </Grid>
           <Grid item>
             <NamespaceMenu />
           </Grid>

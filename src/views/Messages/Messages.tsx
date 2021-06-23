@@ -40,7 +40,6 @@ import { NamespaceContext } from '../../contexts/NamespaceContext';
 import { ApplicationContext } from '../../contexts/ApplicationContext';
 import { DataViewSwitch } from '../../components/DataViewSwitch';
 import { useHistory } from 'react-router-dom';
-import { FilterSelect } from '../../components/FilterSelect';
 
 const PAGE_LIMITS = [10, 25];
 
@@ -54,23 +53,7 @@ export const Messages: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(PAGE_LIMITS[0]);
   const { selectedNamespace } = useContext(NamespaceContext);
-  const { dataView, createdFilter, setCreatedFilter, lastEvent } =
-    useContext(ApplicationContext);
-
-  const createdQueryOptions = [
-    {
-      value: '24hours',
-      label: t('last24Hours'),
-    },
-    {
-      value: '7days',
-      label: t('last7Days'),
-    },
-    {
-      value: '30days',
-      label: t('last30Days'),
-    },
-  ];
+  const { dataView, createdFilter, lastEvent } = useContext(ApplicationContext);
 
   useEffect(() => {
     setLoading(true);
@@ -211,13 +194,6 @@ export const Messages: React.FC = () => {
               </Typography>
             </Grid>
             <Box className={classes.separator} />
-            <Grid item>
-              <FilterSelect
-                filter={createdFilter}
-                setFilter={setCreatedFilter}
-                filterItems={createdQueryOptions}
-              />
-            </Grid>
             <Grid item>
               <DataViewSwitch />
             </Grid>

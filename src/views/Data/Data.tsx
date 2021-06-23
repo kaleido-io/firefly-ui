@@ -30,7 +30,6 @@ import { DataTable } from '../../components/DataTable/DataTable';
 import { HashPopover } from '../../components/HashPopover';
 import { NamespaceContext } from '../../contexts/NamespaceContext';
 import { ApplicationContext } from '../../contexts/ApplicationContext';
-import { FilterSelect } from '../../components/FilterSelect';
 import { DataDetails } from './DataDetails';
 
 const PAGE_LIMITS = [10, 25];
@@ -44,23 +43,7 @@ export const Data: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(PAGE_LIMITS[0]);
   const [viewData, setViewData] = useState<IData | undefined>();
-  const { createdFilter, setCreatedFilter, lastEvent } =
-    useContext(ApplicationContext);
-
-  const createdQueryOptions = [
-    {
-      value: '24hours',
-      label: t('last24Hours'),
-    },
-    {
-      value: '7days',
-      label: t('last7Days'),
-    },
-    {
-      value: '30days',
-      label: t('last30Days'),
-    },
-  ];
+  const { createdFilter, lastEvent } = useContext(ApplicationContext);
 
   const columnHeaders = [
     t('id'),
@@ -164,13 +147,6 @@ export const Data: React.FC = () => {
               </Typography>
             </Grid>
             <Box className={classes.separator} />
-            <Grid item>
-              <FilterSelect
-                filter={createdFilter}
-                setFilter={setCreatedFilter}
-                filterItems={createdQueryOptions}
-              />
-            </Grid>
           </Grid>
           <Grid container item>
             <DataTable

@@ -36,7 +36,6 @@ import { HashPopover } from '../components/HashPopover';
 import { NamespaceContext } from '../contexts/NamespaceContext';
 import { ApplicationContext } from '../contexts/ApplicationContext';
 import { RecentTransactions } from '../components/RecentTransactions/RecentTransactions';
-import { FilterSelect } from '../components/FilterSelect';
 
 export const Dashboard: React.FC = () => {
   const classes = useStyles();
@@ -46,23 +45,7 @@ export const Dashboard: React.FC = () => {
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [orgs, setOrgs] = useState<IOrganization[]>([]);
   const { selectedNamespace } = useContext(NamespaceContext);
-  const { lastEvent, createdFilter, setCreatedFilter } =
-    useContext(ApplicationContext);
-
-  const createdQueryOptions = [
-    {
-      value: '24hours',
-      label: t('last24Hours'),
-    },
-    {
-      value: '7days',
-      label: t('last7Days'),
-    },
-    {
-      value: '30days',
-      label: t('last30Days'),
-    },
-  ];
+  const { lastEvent, createdFilter } = useContext(ApplicationContext);
 
   useEffect(() => {
     let createdFilterString = `&created=>=${dayjs()
@@ -171,13 +154,6 @@ export const Dashboard: React.FC = () => {
             </Typography>
           </Grid>
           <Box className={classes.separator} />
-          <Grid item>
-            <FilterSelect
-              filter={createdFilter}
-              setFilter={setCreatedFilter}
-              filterItems={createdQueryOptions}
-            />
-          </Grid>
         </Grid>
         <Grid
           className={classes.cardContainer}

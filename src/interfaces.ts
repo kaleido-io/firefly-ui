@@ -26,6 +26,12 @@ export type CreatedFilterOptions = '24hours' | '7days' | '30days';
 
 export type FilterOptions = CreatedFilterOptions;
 
+export interface IRoute {
+  exact?: boolean;
+  path: string;
+  component: (props: any) => JSX.Element;
+}
+
 export interface IStatus {
   node: {
     name: string;

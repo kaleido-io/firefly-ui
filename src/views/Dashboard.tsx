@@ -39,7 +39,7 @@ import { RecentTransactions } from '../components/RecentTransactions/RecentTrans
 import { FilterSelect } from '../components/FilterSelect';
 import { fetchWithCredentials } from '../utils';
 
-export const Dashboard: React.FC = () => {
+export const Dashboard = () => {
   const classes = useStyles();
   const { t } = useTranslation();
   const [messages, setMessages] = useState<IMessage[]>([]);

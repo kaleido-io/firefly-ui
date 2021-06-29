@@ -43,7 +43,7 @@ import { fetchWithCredentials } from '../../utils';
 
 const PAGE_LIMITS = [10, 25];
 
-export const Transactions: React.FC = () => {
+export const Transactions = () => {
   const history = useHistory();
   const { t } = useTranslation();
   const classes = useStyles();

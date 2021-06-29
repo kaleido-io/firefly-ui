@@ -39,6 +39,7 @@ import {
 } from './interfaces';
 import ReconnectingWebsocket from 'reconnecting-websocket';
 import { fetchWithCredentials } from './utils';
+import { QueryParamProvider } from 'use-query-params';
 
 const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
 const history = createBrowserHistory({
@@ -130,15 +131,7 @@ function App(): JSX.Element {
           setOrgName(status.org.name);
           const ns: INamespace[] = await namespaceResponse.json();
           setNamespaces(ns);
-          const storageItem = window.localStorage.getItem(
-            NAMESPACE_LOCALSTORAGE_KEY
-          );
-          if (storageItem) {
-            setSelectedNamespace(storageItem);
-          } else if (ns.length !== 0) {
-            setSelectedNamespace(ns[0].name);
-            window.localStorage.setItem(NAMESPACE_LOCALSTORAGE_KEY, ns[0].name);
-          }
+          setSelectedNamespace(status.defaults.namespace);
         }
       })
       .finally(() => {
@@ -185,23 +178,25 @@ function App(): JSX.Element {
           }}
         >
           <Router history={history}>
-            <AppWrapper>
-              <Switch>
-                <Route exact path="/" render={() => <Dashboard />} />
-                <Route exact path="/messages" render={() => <Messages />} />
-                <Route exact path="/data" render={() => <Data />} />
-                <Route
-                  exact
-                  path="/transactions"
-                  render={() => <Transactions />}
-                />
-                <Route
-                  exact
-                  path="/transactions/:id"
-                  render={() => <TransactionDetails />}
-                />
-              </Switch>
-            </AppWrapper>
+            <QueryParamProvider ReactRouterRoute={Route}>
+              <AppWrapper>
+                <Switch>
+                  <Route exact path="/" render={() => <Dashboard />} />
+                  <Route exact path="/messages" render={() => <Messages />} />
+                  <Route exact path="/data" render={() => <Data />} />
+                  <Route
+                    exact
+                    path="/transactions"
+                    render={() => <Transactions />}
+                  />
+                  <Route
+                    exact
+                    path="/transactions/:id"
+                    render={() => <TransactionDetails />}
+                  />
+                </Switch>
+              </AppWrapper>
+            </QueryParamProvider>
           </Router>
         </ApplicationContext.Provider>
       </NamespaceContext.Provider>

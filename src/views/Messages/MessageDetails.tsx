@@ -122,7 +122,7 @@ export const MessageDetails: React.FC<Props> = ({ message, open, onClose }) => {
             size="small"
             className={classes.copyButton}
             onClick={() =>
-              history.push(`/transactions/${txId}`, {
+              history.push(`/transactions/${txId}` + history.location.search, {
                 props: { message: message, open: open },
               })
             }

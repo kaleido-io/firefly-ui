@@ -14,22 +14,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { TextField, MenuItem, makeStyles } from '@material-ui/core';
-import { NamespaceContext } from '../../contexts/NamespaceContext';
-import { NAMESPACE_LOCALSTORAGE_KEY } from '../../App';
+import { useQueryParam, StringParam } from 'use-query-params';
+import { NamespaceContext } from '../contexts/NamespaceContext';
 
 export const NamespaceMenu: React.FC = () => {
   const classes = useStyles();
+  const [namespace, setNamespace] = useQueryParam('namespace', StringParam);
   const { namespaces, selectedNamespace, setSelectedNamespace } =
     useContext(NamespaceContext);
 
   const handleSelectNamespace = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setSelectedNamespace(event.target.value);
-    window.localStorage.setItem(NAMESPACE_LOCALSTORAGE_KEY, event.target.value);
+    setNamespace(event.target.value);
   };
+
+  useEffect(() => {
+    // set namespace if it's present in the url
+    if (namespace && namespaces.find((option) => option.name === namespace)) {
+      setSelectedNamespace(namespace);
+      return;
+    }
+
+    // use namespace from state and update the url
+    setNamespace(selectedNamespace);
+  }, [
+    namespace,
+    namespaces,
+    setSelectedNamespace,
+    setNamespace,
+    selectedNamespace,
+  ]);
 
   return (
     <>
@@ -55,7 +72,7 @@ export const NamespaceMenu: React.FC = () => {
   );
 };
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   form: {
     minWidth: '10ch',
   },

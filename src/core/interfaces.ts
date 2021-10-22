@@ -235,6 +235,7 @@ export interface IPagedTransactionResponse {
 }
 
 export interface NavItem {
+  description?: string;
   icon: MdiReactIconComponentType;
   translationNs: string;
   translationKey: string;

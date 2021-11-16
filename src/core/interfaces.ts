@@ -343,6 +343,7 @@ export interface ITokenTransfer {
   messageHash: string;
   created: string;
   tx: ITokenTx;
+  message: string;
 }
 
 export interface ITokenTransferWithPool extends ITokenTransfer {

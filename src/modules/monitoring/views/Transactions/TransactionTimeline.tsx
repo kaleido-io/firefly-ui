@@ -35,7 +35,7 @@ import {
   getShortHash,
 } from '../../../../core/utils';
 import { DataTableEmptyState } from '../../../../core/components/DataTable/DataTableEmptyState';
-import { useDataTranslation } from '../../registration';
+import { useMonitoringTranslation } from '../../registration';
 
 const ROWS_PER_PAGE = 25;
 
@@ -44,7 +44,7 @@ interface Props {
 }
 
 export const TransactionTimeline: React.FC<Props> = ({ filterString }) => {
-  const { t } = useDataTranslation();
+  const { t } = useMonitoringTranslation();
   const history = useHistory<IHistory>();
   const loadingRef = useRef<HTMLDivElement | null>(null);
   const observer = useIntersectionObserver(loadingRef, {});
@@ -107,16 +107,17 @@ export const TransactionTimeline: React.FC<Props> = ({ filterString }) => {
   ) => {
     if (data) {
       const pages = data.pages.map((page) => page.items);
+      console.log(pages);
       return pages.flat().map((tx) => ({
         key: tx.id,
-        title: getShortHash(tx.hash),
+        title: tx.hash ? getShortHash(tx.hash) : '-',
         description: tx.status,
         time: dayjs(tx.created).format('MM/DD/YYYY h:mm A'),
         icon: <BroadcastIcon />,
-        author: tx.subject.signer,
+        author: tx.subject ? tx.subject.signer : '-',
         onClick: () => {
           history.push(
-            `/namespace/${selectedNamespace}/data/transactions/${tx.id}`
+            `/namespace/${selectedNamespace}/monitoring/transactions/${tx.id}`
           );
         },
       }));

@@ -1,6 +1,10 @@
 {
   "createdOn": "Created On",
   "dashboard": "Dashboard",
+  "blockchain" : "Blockchain",
+  "transactions" : "Transactions",
+  "events": "Events",
+  "blockchainEvents" : "Blockchain Events",
   "details": "Details",
   "emptyPlaceholder": "--",
   "filter": "Filter",
@@ -10,6 +14,7 @@
   "last30Days": "Last 30 Days",
   "last7Days": "Last 7 Days",
   "latestOperations": "Latest Operations",
+  "latestTransactions": "Latest Transactions",
   "monitoring": "Monitoring",
   "name": "Name",
   "no": "No",
@@ -21,5 +26,6 @@
   "subscriptions": "Subscriptions",
   "time": "Time",
   "timestamp": "Timestamp",
-  "type": "Type"
+  "type": "Type",
+  "transactionDetails": "Transaction Details"
 }

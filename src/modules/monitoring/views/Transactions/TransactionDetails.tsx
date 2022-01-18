@@ -33,12 +33,12 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import { fetchWithCredentials } from '../../../../core/utils';
 import { SnackbarContext } from '../../../../core/contexts/SnackbarContext';
-import { useDataTranslation } from '../../registration';
+import { useMonitoringTranslation } from '../../registration';
 
 export const TransactionDetails: () => JSX.Element = () => {
   const history = useHistory();
   const { id } = useParams<{ id: string }>();
-  const { t } = useDataTranslation();
+  const { t } = useMonitoringTranslation();
   const { selectedNamespace } = useContext(NamespaceContext);
   const [transaction, setTransaction] = useState<ITransaction>();
   const [loading, setLoading] = useState(false);
@@ -131,7 +131,9 @@ export const TransactionDetails: () => JSX.Element = () => {
                     'From',
                     <HashPopover
                       textColor="secondary"
-                      address={transaction.subject.signer}
+                      address={
+                        transaction.subject ? transaction.subject.signer : '-'
+                      }
                     />
                   )}
                 </Grid>
@@ -187,7 +189,7 @@ export const TransactionDetails: () => JSX.Element = () => {
                   {detailItem(
                     'type',
                     <Typography className={classes.detailValue}>
-                      {transaction.subject.type}
+                      {transaction.subject ? transaction.subject.type : '-'}
                     </Typography>
                   )}
                 </Grid>
@@ -195,7 +197,9 @@ export const TransactionDetails: () => JSX.Element = () => {
                   {detailItem(
                     'namespace',
                     <Typography className={classes.detailValue}>
-                      {transaction.subject.namespace}
+                      {transaction.subject
+                        ? transaction.subject.namespace
+                        : '-'}
                     </Typography>
                   )}
                 </Grid>
@@ -203,7 +207,9 @@ export const TransactionDetails: () => JSX.Element = () => {
                   {detailItem(
                     'reference',
                     <Typography className={classes.detailValue}>
-                      {transaction.subject.reference}
+                      {transaction.subject
+                        ? transaction.subject.reference
+                        : '-'}
                     </Typography>
                   )}
                 </Grid>

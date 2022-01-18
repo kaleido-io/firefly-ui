@@ -15,22 +15,17 @@
 // limitations under the License.
 
 import i18n from 'i18next';
-import CalendarIcon from 'mdi-react/CalendarIcon';
 import CubeOutlineIcon from 'mdi-react/CubeOutlineIcon';
 import FileTableOutlineIcon from 'mdi-react/FileTableOutlineIcon';
 import MessageTextIcon from 'mdi-react/MessageTextIcon';
-import TextBoxCheckOutlineIcon from 'mdi-react/TextBoxCheckOutlineIcon';
 import ViewDashboardOutlineIcon from 'mdi-react/ViewDashboardOutlineIcon';
 import useModuleTranslation from '../../core/hooks/useModuleTranslation';
 import { IRoute, ModuleNav, NavItem } from '../../core/interfaces';
 import enData from './translations/en.json';
 import { Dashboard } from './views/Dashboard';
 import { Data } from './views/Data/Data';
-import { Events } from './views/Events/Events';
 import { MessageDetails } from './views/Messages/MessageDetails';
 import { Messages } from './views/Messages/Messages';
-import { TransactionDetails } from './views/Transactions/TransactionDetails';
-import { Transactions } from './views/Transactions/Transactions';
 import { Types } from './views/Types/Types';
 
 // Translations
@@ -95,24 +90,6 @@ export const DataModuleNav: ModuleNav = {
     },
     {
       translationNs: DATA_TRANSLATIONS_NS,
-      translationKey: 'transactions',
-      icon: TextBoxCheckOutlineIcon,
-      routesRequireNamespace: DataAppNavItem.routesRequireNamespace,
-      makePathname: (ns?: string) => makeDataPathname(ns, '/transactions'),
-      isActiveCheck: (ns?: string, pathname?: string) =>
-        pathname?.startsWith(makeDataPathname(ns, '/transactions')) || false,
-    },
-    {
-      translationNs: DATA_TRANSLATIONS_NS,
-      translationKey: 'events',
-      icon: CalendarIcon,
-      routesRequireNamespace: DataAppNavItem.routesRequireNamespace,
-      makePathname: (ns?: string) => makeDataPathname(ns, '/events'),
-      isActiveCheck: (ns?: string, pathname?: string) =>
-        pathname?.startsWith(makeDataPathname(ns, '/events')) || false,
-    },
-    {
-      translationNs: DATA_TRANSLATIONS_NS,
       translationKey: 'dataTypes',
       icon: FileTableOutlineIcon,
       routesRequireNamespace: DataAppNavItem.routesRequireNamespace,
@@ -146,21 +123,6 @@ export const DataRoutes: IRoute[] = [
     exact: true,
     route: `${DATA_ROUTE_PREFIX}/messages/:id`,
     component: MessageDetails,
-  },
-  {
-    exact: true,
-    route: `${DATA_ROUTE_PREFIX}/transactions`,
-    component: Transactions,
-  },
-  {
-    exact: true,
-    route: `${DATA_ROUTE_PREFIX}/transactions/:id`,
-    component: TransactionDetails,
-  },
-  {
-    exact: true,
-    route: `${DATA_ROUTE_PREFIX}/events`,
-    component: Events,
   },
   {
     exact: true,

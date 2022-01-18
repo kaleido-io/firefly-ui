@@ -21,7 +21,7 @@ import { ApplicationContext } from '../../../../core/contexts/ApplicationContext
 import { DataViewSwitch } from '../../../../core/components/DataViewSwitch';
 import { TransactionList } from './TransactionList';
 import { TransactionTimeline } from './TransactionTimeline';
-import { useDataTranslation } from '../../registration';
+import { useMonitoringTranslation } from '../../registration';
 import { FilterDisplay } from '../../../../core/components/FilterDisplay';
 import { ArrayParam, withDefault, useQueryParam } from 'use-query-params';
 import { FilterModal } from '../../../../core/components/FilterModal';
@@ -29,7 +29,7 @@ import { filterOperators } from '../../../../core/utils';
 import { DatePicker } from '../../../../core/components/DatePicker';
 
 export const Transactions: () => JSX.Element = () => {
-  const { t } = useDataTranslation();
+  const { t } = useMonitoringTranslation();
   const classes = useStyles();
   const { dataView } = useContext(ApplicationContext);
   const [filterAnchor, setFilterAnchor] = useState<HTMLButtonElement | null>(

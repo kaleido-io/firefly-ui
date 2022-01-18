@@ -15,11 +15,20 @@
 // limitations under the License.
 
 import i18n from 'i18next';
+import CalendarIcon from 'mdi-react/CalendarIcon';
+import CubeOutlineIcon from 'mdi-react/CubeOutlineIcon';
 import FanIcon from 'mdi-react/FanIcon';
+import TextBoxCheckOutlineIcon from 'mdi-react/TextBoxCheckOutlineIcon';
+import ViewDashboardOutlineIcon from 'mdi-react/ViewDashboardOutlineIcon';
 import useModuleTranslation from '../../core/hooks/useModuleTranslation';
 import { IRoute, ModuleNav, NavItem } from '../../core/interfaces';
 import enData from './translations/en.json';
+import { Events as BlockchainEvents } from './views/Blockchain/Events';
+import { Dashboard } from './views/Dashboard';
+import { Events } from './views/Events/Events';
 import { Operations } from './views/Operations/Operations';
+import { TransactionDetails } from './views/Transactions/TransactionDetails';
+import { Transactions } from './views/Transactions/Transactions';
 // Translations
 
 export const MONITORING_TRANSLATIONS_NS = 'monitoring';
@@ -55,12 +64,52 @@ export const MonitoringModuleNav: ModuleNav = {
   navItems: [
     {
       translationNs: MONITORING_TRANSLATIONS_NS,
-      translationKey: 'operations',
-      icon: FanIcon,
+      translationKey: 'dashboard',
+      icon: ViewDashboardOutlineIcon,
       routesRequireNamespace: MonitoringAppNavItem.routesRequireNamespace,
       makePathname: (ns?: string) => makeMonitoringPathname(ns, ''),
       isActiveCheck: (ns?: string, pathname?: string) =>
-        pathname?.startsWith(makeMonitoringPathname(ns, '')) || false,
+        pathname === makeMonitoringPathname(ns),
+    },
+    {
+      translationNs: MONITORING_TRANSLATIONS_NS,
+      translationKey: 'transactions',
+      icon: TextBoxCheckOutlineIcon,
+      routesRequireNamespace: MonitoringAppNavItem.routesRequireNamespace,
+      makePathname: (ns?: string) =>
+        makeMonitoringPathname(ns, '/transactions'),
+      isActiveCheck: (ns?: string, pathname?: string) =>
+        pathname?.startsWith(makeMonitoringPathname(ns, '/transactions')) ||
+        false,
+    },
+    {
+      translationNs: MONITORING_TRANSLATIONS_NS,
+      translationKey: 'operations',
+      icon: FanIcon,
+      routesRequireNamespace: MonitoringAppNavItem.routesRequireNamespace,
+      makePathname: (ns?: string) => makeMonitoringPathname(ns, '/operations'),
+      isActiveCheck: (ns?: string, pathname?: string) =>
+        pathname?.startsWith(makeMonitoringPathname(ns, '/operations')) ||
+        false,
+    },
+    {
+      translationNs: MONITORING_TRANSLATIONS_NS,
+      translationKey: 'blockchain',
+      icon: CubeOutlineIcon,
+      routesRequireNamespace: MonitoringAppNavItem.routesRequireNamespace,
+      makePathname: (ns?: string) => makeMonitoringPathname(ns, '/blockchain'),
+      isActiveCheck: (ns?: string, pathname?: string) =>
+        pathname?.startsWith(makeMonitoringPathname(ns, '/blockchain')) ||
+        false,
+    },
+    {
+      translationNs: MONITORING_TRANSLATIONS_NS,
+      translationKey: 'events',
+      icon: CalendarIcon,
+      routesRequireNamespace: MonitoringAppNavItem.routesRequireNamespace,
+      makePathname: (ns?: string) => makeMonitoringPathname(ns, '/events'),
+      isActiveCheck: (ns?: string, pathname?: string) =>
+        pathname?.startsWith(makeMonitoringPathname(ns, '/events')) || false,
     },
   ],
 };
@@ -71,6 +120,31 @@ export const MonitoringRoutes: IRoute[] = [
   {
     exact: true,
     route: `${MONITORING_ROUTE_PREFIX}`,
+    component: Dashboard,
+  },
+  {
+    exact: true,
+    route: `${MONITORING_ROUTE_PREFIX}/operations`,
     component: Operations,
+  },
+  {
+    exact: true,
+    route: `${MONITORING_ROUTE_PREFIX}/transactions`,
+    component: Transactions,
+  },
+  {
+    exact: true,
+    route: `${MONITORING_ROUTE_PREFIX}/transactions/:id`,
+    component: TransactionDetails,
+  },
+  {
+    exact: true,
+    route: `${MONITORING_ROUTE_PREFIX}/blockchain`,
+    component: BlockchainEvents,
+  },
+  {
+    exact: true,
+    route: `${MONITORING_ROUTE_PREFIX}/events`,
+    component: Events,
   },
 ];

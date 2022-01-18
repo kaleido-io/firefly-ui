@@ -31,7 +31,7 @@ import { HashPopover } from '../../../../core/components/HashPopover';
 import { NamespaceContext } from '../../../../core/contexts/NamespaceContext';
 import { ApplicationContext } from '../../../../core/contexts/ApplicationContext';
 import { fetchWithCredentials, getCreatedFilter } from '../../../../core/utils';
-import { useDataTranslation } from '../../registration';
+import { useMonitoringTranslation } from '../../registration';
 import { DataTableEmptyState } from '../../../../core/components/DataTable/DataTableEmptyState';
 import { Histogram } from '../../../../core/components/Charts/Histogram';
 
@@ -43,7 +43,7 @@ interface Props {
 
 export const TransactionList: React.FC<Props> = ({ filterString }) => {
   const history = useHistory();
-  const { t } = useDataTranslation();
+  const { t } = useMonitoringTranslation();
   const classes = useStyles();
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [txMetrics, setTxMetrics] = useState<IMetric[]>();

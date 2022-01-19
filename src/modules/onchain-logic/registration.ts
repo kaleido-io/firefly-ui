@@ -36,14 +36,14 @@ export const useOnChainLogicTranslation = (): {
 // Navigation
 
 const makeOnChainLogicPathname = (ns?: string, pathSuffix?: string): string =>
-  `${ONCHAIN_LOGIC_ROUTE_PREFIX}${pathSuffix || ''}`;
+  `/namespace/${ns}/onchain-logic${pathSuffix || ''}`;
 
 export const OnChainLogicAppNavItem: NavItem = {
   translationNs: ONCHAIN_LOGIC_TRANSLATIONS_NS,
   translationKey: 'onChainLogic',
   icon: FileCodeOutlineIcon,
   description: 'onChainLogicDescription',
-  routesRequireNamespace: false,
+  routesRequireNamespace: true,
   makePathname: makeOnChainLogicPathname,
   isActiveCheck: (ns?: string, pathname?: string) =>
     pathname?.startsWith(makeOnChainLogicPathname(ns)) || false,
@@ -69,7 +69,7 @@ export const OnChainLogicModuleNav: ModuleNav = {
 };
 
 // Routes
-const ONCHAIN_LOGIC_ROUTE_PREFIX = '/onchain-logic';
+const ONCHAIN_LOGIC_ROUTE_PREFIX = '/namespace/:namespace/onchain-logic';
 export const OnChainLogicRoutes: IRoute[] = [
   {
     exact: true,

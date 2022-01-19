@@ -15,296 +15,165 @@
 // limitations under the License.
 
 import {
-  Box,
-  Card,
-  CardContent,
+  Avatar,
   CircularProgress,
   Grid,
-  Paper,
+  TablePagination,
   Typography,
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import dayjs from 'dayjs';
-import CheckboxBlankCircleIcon from 'mdi-react/CheckboxBlankCircleIcon';
-import React, { useContext, useEffect, useState } from 'react';
-import { useParams } from 'react-router';
-import { HistogramSparkChart } from '../../../core/components/Charts/HistogramSparkChart';
+import React, { useState } from 'react';
 import {
-  mapPieChartData,
-  PieChart,
-} from '../../../core/components/Charts/PieChart';
-import { DatePicker } from '../../../core/components/DatePicker';
-import { ApplicationContext } from '../../../core/contexts/ApplicationContext';
-import {
-  FFColors,
-  ICreatedFilter,
-  IGenericPagedResponse,
-  IMetric,
-  IPieChartElement,
-  TXStatus,
+  IDataTableRecord,
+  INode,
+  IOrganization,
+  IStatus,
 } from '../../../core/interfaces';
-import { fetchWithCredentials, getCreatedFilter } from '../../../core/utils';
+import { useQuery } from 'react-query';
+import { fetchCatcher } from '../../../core/utils';
 import { useOnChainLogicTranslation } from '../registration';
+import { HashPopover } from '../../../core/components/HashPopover';
+import { DataTable } from '../../../core/components/DataTable/DataTable';
 
-interface IChartPanel {
-  chart: JSX.Element;
-  data: IPieChartElement[] | undefined;
-  title: string;
-}
-
-interface ISummaryPanel {
-  metrics: IMetric[];
-  title: string;
-  total: string | undefined;
-}
-
-const TX_STATUS_COLORS: { [key in TXStatus]: string } = {
-  Succeeded: FFColors.Blue,
-  Pending: FFColors.Yellow,
-  Error: FFColors.Red,
-};
+const PAGE_LIMITS = [10, 25];
 
 export const Dashboard: () => JSX.Element = () => {
-  const classes = useStyles();
   const { t } = useOnChainLogicTranslation();
-  // Totals
-  const [txTotal, setTxTotal] = useState(undefined);
-  const [eventsTotal, setEventsTotal] = useState(undefined);
-  // Latest data for pie charts
-  const [latestTx, setLatestTx] = useState<IGenericPagedResponse[] | undefined>(
-    undefined
-  );
-  // Metrics
-  const [txMetrics, setTxMetrics] = useState<IMetric[]>([]);
-  const [eventsMetrics, setEventsMetrics] = useState<IMetric[]>([]);
-  const { lastEvent, createdFilter } = useContext(ApplicationContext);
-  const { namespace } = useParams<{ namespace: string }>();
 
-  useEffect(() => {
-    const createdFilterObject: ICreatedFilter = getCreatedFilter(createdFilter);
-    // Total counts
-    Promise.all([
-      fetchWithCredentials(
-        `/api/v1/namespaces/${namespace}/transactions?count${createdFilterObject.filterString}&limit=1`
-      ),
-      fetchWithCredentials(
-        `/api/v1/namespaces/${namespace}/events?count${createdFilterObject.filterString}&limit=1`
-      ),
-    ]).then(async ([txResponse, eventsResponse]) => {
-      if (txResponse.ok && eventsResponse.ok) {
-        const txJson = await txResponse.json();
-        const eventsJson = await eventsResponse.json();
-        setTxTotal(txJson.total);
-        setEventsTotal(eventsJson.total);
-      }
-    });
-    // Tx Pie Chart
-    const txStatusObject: { [key: string]: string } = TXStatus;
-    const txEnums = Object.keys(TXStatus).map(
-      (key: string) => txStatusObject[key]
-    );
-    Promise.all(
-      txEnums.map((e) =>
-        fetchWithCredentials(
-          `/api/v1/namespaces/${namespace}/transactions?count${createdFilterObject.filterString}&limit=1&status=${e}`
-        )
-      )
-    ).then(async (txStatusResponses) => {
-      if (txStatusResponses.every((e) => e.ok)) {
-        const txStatusResponseJsons: IGenericPagedResponse[] = [];
-        for (let i = 0; i < txStatusResponses.length; i++) {
-          await txStatusResponseJsons.push(await txStatusResponses[i].json());
-        }
-        setLatestTx(txStatusResponseJsons);
-      }
-    });
-  }, [namespace, lastEvent, createdFilter]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(PAGE_LIMITS[0]);
 
-  useEffect(() => {
-    const currentTime = dayjs().unix();
-    const createdFilterObject: ICreatedFilter = getCreatedFilter(createdFilter);
-    // Metrics
-    Promise.all([
-      fetchWithCredentials(
-        `/api/v1/namespaces/${namespace}/charts/histogram/transactions?startTime=${createdFilterObject.filterTime}&endTime=${currentTime}&buckets=40`
-      ),
-      fetchWithCredentials(
-        `/api/v1/namespaces/${namespace}/charts/histogram/events?startTime=${createdFilterObject.filterTime}&endTime=${currentTime}&buckets=40`
-      ),
-    ]).then(async ([txMetricsResponse, eventsMetricsResponse]) => {
-      if (txMetricsResponse.ok && eventsMetricsResponse.ok) {
-        const txMetricsJson = await txMetricsResponse.json();
-        const eventsMetricsJson = await eventsMetricsResponse.json();
-        setTxMetrics(txMetricsJson);
-        setEventsMetrics(eventsMetricsJson);
-      }
-    });
-  }, [namespace, lastEvent, createdFilter]);
-
-  const summaryPanels: ISummaryPanel[] = [
-    {
-      metrics: txMetrics,
-      title: t('transactions'),
-      total: txTotal,
-    },
-    {
-      metrics: eventsMetrics,
-      title: t('events'),
-      total: eventsTotal,
-    },
-  ];
-
-  const chartPanels: IChartPanel[] = [
-    {
-      chart:
-        latestTx !== undefined ? (
-          <>
-            <PieChart
-              data={mapPieChartData(latestTx, TX_STATUS_COLORS, TXStatus)}
-              dataType={t('transactions')}
-            ></PieChart>
-          </>
-        ) : (
-          <CircularProgress />
-        ),
-      data: latestTx && mapPieChartData(latestTx, TX_STATUS_COLORS, TXStatus),
-      title: t('latestTransactions'),
-    },
-  ];
-
-  const pieChartPanel = (data: IChartPanel): JSX.Element => (
-    <Paper className={classes.paper}>
-      <Grid container justifyContent="space-between" direction="row">
-        <Grid item>
-          <Typography className={classes.header}>{data.title}</Typography>
-        </Grid>
-      </Grid>
-      <Grid className={classes.pieChartHeight}>{data.chart}</Grid>
-      <Grid className={classes.pieChartDetailsHeight}>
-        {data.data?.map((d) => {
-          return (
-            <>
-              <Grid container direction="row">
-                <Grid
-                  container
-                  item
-                  xs={6}
-                  spacing={2}
-                  direction="row"
-                  justifyContent="flex-start"
-                  alignItems="center"
-                >
-                  <Grid color={d.color} item>
-                    <CheckboxBlankCircleIcon />
-                  </Grid>
-                  <Grid item>
-                    <Typography variant="subtitle1">{d.label}</Typography>
-                  </Grid>
-                </Grid>
-                <Grid
-                  container
-                  item
-                  xs={6}
-                  spacing={2}
-                  direction="row"
-                  justifyContent="flex-end"
-                  alignItems="center"
-                >
-                  <Grid item>
-                    <Typography variant="subtitle1">{d.value}</Typography>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </>
-          );
-        })}
-      </Grid>
-    </Paper>
+  const getOrgsApi = '/api/v1/network/organizations';
+  const getOrgsFn = () => fetchCatcher(getOrgsApi);
+  const { data: orgs, isLoading: orgsLoading } = useQuery<IOrganization[]>(
+    getOrgsApi,
+    getOrgsFn
   );
 
-  const summaryPanel = (data: ISummaryPanel): JSX.Element => (
-    <Card sx={{ height: '140px', width: '100%' }}>
-      <CardContent className={classes.content}>
-        <Grid
-          container
-          direction="row"
-          justifyContent="center"
-          alignItems="flex-start"
-        >
-          <Grid item xs={6}>
-            <Typography align="left" noWrap className={classes.summaryLabel}>
-              {data.title}
-            </Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography
-              align="right"
-              alignItems="flex-start"
-              noWrap
-              className={classes.summaryValue}
+  const getNodesApi = '/api/v1/network/nodes';
+  const getNodesFn = () => fetchCatcher(getNodesApi);
+  const { data: nodes, isLoading: nodesLoading } = useQuery<INode[]>(
+    getNodesApi,
+    getNodesFn
+  );
+
+  const getStatusApi = '/api/v1/status';
+  const getStatusFn = () => fetchCatcher(getStatusApi);
+  const { data: status, isLoading: statusLoading } = useQuery<IStatus>(
+    getStatusApi,
+    getStatusFn
+  );
+
+  const orgMap: Map<IOrganization, INode[] | undefined> = new Map();
+  orgs?.forEach((o) =>
+    orgMap.set(
+      o,
+      nodes?.filter((n) => n.owner === o.identity)
+    )
+  );
+
+  const columnHeaders = [
+    t('organization'),
+    t('fireflyNodes'),
+    t('orgId'),
+    t('identity'),
+    t('joined'),
+  ];
+
+  const handleChangePage = (_event: unknown, newPage: number) => {
+    setCurrentPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setCurrentPage(0);
+    setRowsPerPage(+event.target.value);
+  };
+
+  const pagination = (
+    <TablePagination
+      component="div"
+      count={-1}
+      rowsPerPage={rowsPerPage}
+      page={currentPage}
+      onPageChange={handleChangePage}
+      onRowsPerPageChange={handleChangeRowsPerPage}
+      rowsPerPageOptions={PAGE_LIMITS}
+      labelDisplayedRows={({ from, to }) => `${from} - ${to}`}
+      sx={{ color: (theme) => theme.palette.text.secondary }}
+    />
+  );
+
+  const records: IDataTableRecord[] = [];
+
+  orgMap.forEach((n, o) => {
+    const isMyOrg = status?.org.identity === o.identity;
+    records.push({
+      key: o.id,
+      columns: [
+        {
+          value: (
+            <Grid
+              item
+              container
+              direction="row"
+              alignItems="center"
+              spacing={3}
             >
-              {data.total !== undefined ? data.total : <CircularProgress />}
-            </Typography>
-          </Grid>
-        </Grid>
-      </CardContent>
-      <Grid container sx={{ height: '45px', width: '100%' }}>
-        <HistogramSparkChart
-          colors={[FFColors.Blue]}
-          data={data.metrics}
-          indexBy={'timestamp'}
-          keys={['count']}
-        />
-      </Grid>
-    </Card>
-  );
+              <Grid item>
+                <Avatar
+                  sx={{
+                    textTransform: 'uppercase',
+                    backgroundColor: (theme) =>
+                      isMyOrg
+                        ? theme.palette.info.dark
+                        : theme.palette.secondary.main,
+                    color: (theme) => theme.palette.text.primary,
+                  }}
+                  alt={o.name}
+                >
+                  {o.name.charAt(0)}
+                </Avatar>
+              </Grid>
+              <Grid item>{o.name}</Grid>
+            </Grid>
+          ),
+        },
+        { value: n?.length || 0 },
+        {
+          value: o.id,
+        },
+        {
+          value: <HashPopover textColor="secondary" address={o.identity} />,
+        },
+        { value: dayjs(o.created).format('MM/DD/YYYY h:mm A') },
+      ],
+    });
+  });
+
+  const content =
+    orgsLoading || nodesLoading || statusLoading ? (
+      <CircularProgress />
+    ) : (
+      <DataTable
+        minHeight="300px"
+        maxHeight="calc(100vh - 340px)"
+        {...{ columnHeaders }}
+        {...{ records }}
+        {...{ pagination }}
+      />
+    );
 
   return (
-    <Grid container justifyContent="center">
-      <Grid container item wrap="nowrap" direction="column">
-        <Grid container item direction="row">
-          <Grid className={classes.headerContainer} item>
-            <Typography variant="h4" className={classes.header}>
-              {t('dashboard')}
-            </Typography>
-          </Grid>
-          <Box className={classes.separator} />
-          <Grid item>
-            <DatePicker />
-          </Grid>
-        </Grid>
-        <Grid
-          className={classes.cardContainer}
-          spacing={4}
-          container
-          item
-          direction="row"
-        >
-          {summaryPanels.map((panel: ISummaryPanel, idx: number) => {
-            return (
-              <Grid sm={12} md={6} lg={4} item key={idx}>
-                {summaryPanel(panel)}
-              </Grid>
-            );
-          })}
-        </Grid>
-        <Grid container item direction="row" spacing={6}>
-          {chartPanels.map((panel: IChartPanel, idx: number) => {
-            return (
-              <Grid
-                container
-                item
-                md={12}
-                lg={6}
-                key={idx}
-                className={classes.chartPanel}
-              >
-                {pieChartPanel(panel)}
-              </Grid>
-            );
-          })}
-        </Grid>
+    <Grid container item wrap="nowrap" direction="column" spacing={3}>
+      <Grid item>
+        <Typography variant="h4" fontWeight="bold">
+          {t('onChainLogic')}
+        </Typography>
       </Grid>
+      <Grid item>{content}</Grid>
     </Grid>
   );
 };

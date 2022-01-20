@@ -3,6 +3,8 @@
   "dashboard": "Dashboard",
   "blockchain" : "Blockchain",
   "transactions" : "Transactions",
+  "contract": "Contract",
+  "description": "Description",
   "events": "Events",
   "blockchainEvents" : "Blockchain Events",
   "details": "Details",
@@ -15,6 +17,7 @@
   "last7Days": "Last 7 Days",
   "latestOperations": "Latest Operations",
   "latestTransactions": "Latest Transactions",
+  "message": "Message",
   "monitoring": "Monitoring",
   "name": "Name",
   "no": "No",
@@ -29,5 +32,6 @@
   "time": "Time",
   "timestamp": "Timestamp",
   "type": "Type",
-  "transactionDetails": "Transaction Details"
+  "transactionDetails": "Transaction Details",
+  "version": "Version"
 }

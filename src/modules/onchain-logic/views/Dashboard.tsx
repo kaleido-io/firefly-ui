@@ -15,26 +15,19 @@
 // limitations under the License.
 
 import {
-  Avatar,
   CircularProgress,
   Grid,
   TablePagination,
   Typography,
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import dayjs from 'dayjs';
-import React, { useState } from 'react';
-import {
-  IDataTableRecord,
-  INode,
-  IOrganization,
-  IStatus,
-} from '../../../core/interfaces';
+import React, { useState, useContext } from 'react';
+import { IDataTableRecord, IContractInterface } from '../../../core/interfaces';
 import { useQuery } from 'react-query';
 import { fetchCatcher } from '../../../core/utils';
 import { useOnChainLogicTranslation } from '../registration';
-import { HashPopover } from '../../../core/components/HashPopover';
 import { DataTable } from '../../../core/components/DataTable/DataTable';
+import { NamespaceContext } from '../../../core/contexts/NamespaceContext';
+import FileCodeOutlineIcon from 'mdi-react/FileCodeOutlineIcon';
 
 const PAGE_LIMITS = [10, 25];
 
@@ -43,42 +36,24 @@ export const Dashboard: () => JSX.Element = () => {
 
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(PAGE_LIMITS[0]);
+  const { selectedNamespace } = useContext(NamespaceContext);
 
-  const getOrgsApi = '/api/v1/network/organizations';
-  const getOrgsFn = () => fetchCatcher(getOrgsApi);
-  const { data: orgs, isLoading: orgsLoading } = useQuery<IOrganization[]>(
-    getOrgsApi,
-    getOrgsFn
-  );
-
-  const getNodesApi = '/api/v1/network/nodes';
-  const getNodesFn = () => fetchCatcher(getNodesApi);
-  const { data: nodes, isLoading: nodesLoading } = useQuery<INode[]>(
-    getNodesApi,
-    getNodesFn
-  );
-
-  const getStatusApi = '/api/v1/status';
-  const getStatusFn = () => fetchCatcher(getStatusApi);
-  const { data: status, isLoading: statusLoading } = useQuery<IStatus>(
-    getStatusApi,
-    getStatusFn
-  );
-
-  const orgMap: Map<IOrganization, INode[] | undefined> = new Map();
-  orgs?.forEach((o) =>
-    orgMap.set(
-      o,
-      nodes?.filter((n) => n.owner === o.identity)
-    )
-  );
+  const getContractsInterfacesApi = `/api/v1/namespaces/${selectedNamespace}/contracts/interfaces?limit=${rowsPerPage}&skip=${
+    rowsPerPage * currentPage
+  }`;
+  const getContractsInterfaces = () => fetchCatcher(getContractsInterfacesApi);
+  const { data: contractInterfaces, isLoading: contractInterfacesLoading } =
+    useQuery<IContractInterface[]>(
+      getContractsInterfacesApi,
+      getContractsInterfaces
+    );
 
   const columnHeaders = [
-    t('organization'),
-    t('fireflyNodes'),
-    t('orgId'),
-    t('identity'),
-    t('joined'),
+    t('contract'),
+    t('id'),
+    t('message'),
+    t('description'),
+    t('version'),
   ];
 
   const handleChangePage = (_event: unknown, newPage: number) => {
@@ -108,8 +83,7 @@ export const Dashboard: () => JSX.Element = () => {
 
   const records: IDataTableRecord[] = [];
 
-  orgMap.forEach((n, o) => {
-    const isMyOrg = status?.org.identity === o.identity;
+  contractInterfaces?.forEach((o) => {
     records.push({
       key: o.id,
       columns: [
@@ -122,49 +96,38 @@ export const Dashboard: () => JSX.Element = () => {
               alignItems="center"
               spacing={3}
             >
-              <Grid item>
-                <Avatar
-                  sx={{
-                    textTransform: 'uppercase',
-                    backgroundColor: (theme) =>
-                      isMyOrg
-                        ? theme.palette.info.dark
-                        : theme.palette.secondary.main,
-                    color: (theme) => theme.palette.text.primary,
-                  }}
-                  alt={o.name}
-                >
-                  {o.name.charAt(0)}
-                </Avatar>
+              <Grid item mt={1}>
+                <FileCodeOutlineIcon />
               </Grid>
               <Grid item>{o.name}</Grid>
             </Grid>
           ),
         },
-        { value: n?.length || 0 },
         {
           value: o.id,
         },
         {
-          value: <HashPopover textColor="secondary" address={o.identity} />,
+          value: o.message,
         },
-        { value: dayjs(o.created).format('MM/DD/YYYY h:mm A') },
+        {
+          value: o.description,
+        },
+        { value: o.version },
       ],
     });
   });
 
-  const content =
-    orgsLoading || nodesLoading || statusLoading ? (
-      <CircularProgress />
-    ) : (
-      <DataTable
-        minHeight="300px"
-        maxHeight="calc(100vh - 340px)"
-        {...{ columnHeaders }}
-        {...{ records }}
-        {...{ pagination }}
-      />
-    );
+  const content = contractInterfacesLoading ? (
+    <CircularProgress />
+  ) : (
+    <DataTable
+      minHeight="300px"
+      maxHeight="calc(100vh - 340px)"
+      {...{ columnHeaders }}
+      {...{ records }}
+      {...{ pagination }}
+    />
+  );
 
   return (
     <Grid container item wrap="nowrap" direction="column" spacing={3}>
@@ -177,49 +140,3 @@ export const Dashboard: () => JSX.Element = () => {
     </Grid>
   );
 };
-
-const useStyles = makeStyles((theme) => ({
-  header: {
-    fontWeight: 'bold',
-  },
-  headerContainer: {
-    marginBottom: theme.spacing(5),
-  },
-  summaryLabel: {
-    color: theme.palette.text.secondary,
-    textTransform: 'uppercase',
-    fontSize: 12,
-  },
-  summaryValue: {
-    fontSize: 32,
-  },
-  paper: {
-    width: '100%',
-    height: '100%',
-    padding: theme.spacing(3),
-  },
-  pieChartHeight: {
-    width: '100%',
-    height: '65%',
-    padding: theme.spacing(1),
-  },
-  pieChartDetailsHeight: {
-    width: '100%',
-    height: '35%',
-    padding: theme.spacing(1),
-    overflow: 'auto',
-  },
-  content: {
-    paddingTop: theme.spacing(3),
-  },
-  cardContainer: {
-    paddingBottom: theme.spacing(4),
-  },
-  separator: {
-    flexGrow: 1,
-  },
-  chartPanel: {
-    minHeight: '600px',
-    maxHeight: 'calc(100vh - 340px)',
-  },
-}));

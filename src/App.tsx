@@ -104,7 +104,7 @@ const App: React.FC = () => {
 
   if (initialized) {
     if (initError) {
-      // figure this out
+      // figure out what to display
       return <></>;
     } else {
       return (

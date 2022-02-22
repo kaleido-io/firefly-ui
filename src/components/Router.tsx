@@ -20,8 +20,8 @@ import { BrowserRouter, useRoutes } from 'react-router-dom';
 import { QueryParamProvider } from 'use-query-params';
 import { AppWrapper } from './AppWrapper';
 import { FFRouteObject } from '../interfaces';
-import { HomeRoutes } from '../pages/Home/routes';
-import { ActivityRoutes } from '../pages/Activity/routes';
+import { HomeRoutes } from '../pages/Home/Routes';
+import { ActivityRoutes } from '../pages/Activity/Routes';
 
 const queryClient = new QueryClient({
   defaultOptions: {

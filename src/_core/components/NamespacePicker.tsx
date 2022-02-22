@@ -17,7 +17,6 @@
 import { MenuItem, TextField } from '@mui/material';
 import React, { useContext } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-// import { RouterParams } from '../../components/Navigation/NavigationInterfaces';
 import { ApplicationContext } from '../../contexts/ApplicationContext';
 
 export const NamespacePicker: React.FC = () => {

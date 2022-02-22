@@ -92,6 +92,7 @@ export const ActivityNav = () => {
             name={item.name}
             action={item.action}
             itemIsActive={item.itemIsActive}
+            key={item.name}
           />
         ))}
       </Collapse>

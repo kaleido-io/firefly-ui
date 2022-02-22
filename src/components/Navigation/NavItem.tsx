@@ -14,23 +14,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { Dispatch, SetStateAction } from 'react';
-import { INamespace } from '../_core/interfaces';
+import {
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+} from '@mui/material';
 
-export interface INamespaceContext {
-  selectedNamespace: string;
-  setSelectedNamespace: Dispatch<SetStateAction<string>>;
-  namespaces: INamespace[];
-  setNamespaces: Dispatch<SetStateAction<INamespace[]>>;
+interface Props {
+  name: string;
+  action: () => void;
+  icon?: JSX.Element;
+  itemIsActive?: boolean;
 }
 
-export const NamespaceContext = React.createContext<INamespaceContext>({
-  selectedNamespace: '',
-  setNamespaces: () => {
-    /* default value */
-  },
-  namespaces: [],
-  setSelectedNamespace: () => {
-    /* default value */
-  },
-});
+export const NavItem = ({ name, action, icon, itemIsActive }: Props) => {
+  return (
+    <ListItemButton onClick={action}>
+      <ListItemIcon>{icon}</ListItemIcon>
+      <ListItemText>
+        <Typography>{name}</Typography>
+      </ListItemText>
+    </ListItemButton>
+  );
+};

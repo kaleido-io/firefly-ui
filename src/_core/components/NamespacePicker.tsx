@@ -13,16 +13,17 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 import { MenuItem, TextField } from '@mui/material';
 import React, { useContext } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { RouterParams } from '../../navigation/NavigationInterfaces';
-import { NamespaceContext } from '../../contexts/NamespaceContext';
+// import { RouterParams } from '../../components/Navigation/NavigationInterfaces';
+import { ApplicationContext } from '../../contexts/ApplicationContext';
 
 export const NamespacePicker: React.FC = () => {
-  const { namespace: routerNamespace } = useParams<RouterParams.NAMESPACE>();
+  const { namespace } = useParams();
   const { selectedNamespace, setSelectedNamespace, namespaces } =
-    useContext(NamespaceContext);
+    useContext(ApplicationContext);
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
@@ -30,7 +31,7 @@ export const NamespacePicker: React.FC = () => {
     setSelectedNamespace(namespace);
     navigate(
       pathname
-        .replace(`/namespace/${routerNamespace}`, `/namespace/${namespace}`)
+        .replace(`/namespace/${namespace}`, `/namespace/${namespace}`)
         .split('/')
         .slice(0, 4) // redirect to the moduleRoutePrefix for the module (/namespace/:namespace/MODULE)
         .join('/')

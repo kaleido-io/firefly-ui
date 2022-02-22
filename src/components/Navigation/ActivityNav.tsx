@@ -27,8 +27,8 @@ import ExpandLess from 'mdi-react/ChevronUpIcon';
 import ExpandMore from 'mdi-react/ChevronDownIcon';
 import ChartBoxOutline from 'mdi-react/ChartBoxOutlineIcon';
 import { NavItem } from './NavItem';
-import { useNavigate } from 'react-router-dom';
-import { NAMESPACES_PATH } from '../../interfaces';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { INavItem, NAMESPACES_PATH } from '../../interfaces';
 import { ApplicationContext } from '../../contexts/ApplicationContext';
 import {
   ACTIVITY_PATH,
@@ -36,16 +36,49 @@ import {
   OPERATIONS_PATH,
   TRANSACTIONS_PATH,
 } from '../../interfaces';
+import { themeOptions } from '../../theme';
 
 export const ActivityNav = () => {
   const { t } = useTranslation();
   const [activityOpen, setActivityOpen] = useState(false);
   const navigate = useNavigate();
   const { selectedNamespace } = useContext(ApplicationContext);
+  const { pathname } = useLocation();
+  const baseActivityPath = `/${NAMESPACES_PATH}/${selectedNamespace}/${ACTIVITY_PATH}`;
+
+  const navItems: INavItem[] = [
+    {
+      name: t('dashboard'),
+      action: () => navigate(baseActivityPath),
+      itemIsActive: pathname === baseActivityPath,
+    },
+    {
+      name: t('events'),
+      action: () => navigate(`${baseActivityPath}/${EVENTS_PATH}`),
+      itemIsActive: pathname === `${baseActivityPath}/${EVENTS_PATH}`,
+    },
+    {
+      name: t('transactions'),
+      action: () => navigate(`${baseActivityPath}/${TRANSACTIONS_PATH}`),
+      itemIsActive: pathname === `${baseActivityPath}/${TRANSACTIONS_PATH}`,
+    },
+    {
+      name: t('operations'),
+      action: () => navigate(`${baseActivityPath}/${OPERATIONS_PATH}`),
+      itemIsActive: pathname === `${baseActivityPath}/${OPERATIONS_PATH}`,
+    },
+  ];
 
   return (
     <>
-      <ListItemButton onClick={() => setActivityOpen(!activityOpen)}>
+      <ListItemButton
+        sx={{
+          borderLeft: 6,
+          borderLeftColor: themeOptions.palette?.background?.default,
+          backgroundColor: themeOptions.palette?.background?.default,
+        }}
+        onClick={() => setActivityOpen(!activityOpen)}
+      >
         <ListItemIcon>{<ChartBoxOutline />}</ListItemIcon>
         <ListItemText>
           <Typography>{t('activity')}</Typography>
@@ -54,36 +87,13 @@ export const ActivityNav = () => {
       </ListItemButton>
 
       <Collapse in={activityOpen} unmountOnExit>
-        <NavItem
-          name={t('dashboard')}
-          action={() =>
-            navigate(`${NAMESPACES_PATH}/${selectedNamespace}/${ACTIVITY_PATH}`)
-          }
-        />
-        <NavItem
-          name={t('events')}
-          action={() =>
-            navigate(
-              `${NAMESPACES_PATH}/${selectedNamespace}/${ACTIVITY_PATH}/${EVENTS_PATH}`
-            )
-          }
-        />
-        <NavItem
-          name={t('transactions')}
-          action={() =>
-            navigate(
-              `${NAMESPACES_PATH}/${selectedNamespace}/${ACTIVITY_PATH}/${TRANSACTIONS_PATH}`
-            )
-          }
-        />
-        <NavItem
-          name={t('operations')}
-          action={() =>
-            navigate(
-              `${NAMESPACES_PATH}/${selectedNamespace}/${ACTIVITY_PATH}/${OPERATIONS_PATH}`
-            )
-          }
-        />
+        {navItems.map((item) => (
+          <NavItem
+            name={item.name}
+            action={item.action}
+            itemIsActive={item.itemIsActive}
+          />
+        ))}
       </Collapse>
     </>
   );

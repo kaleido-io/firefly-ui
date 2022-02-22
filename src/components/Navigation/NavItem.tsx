@@ -20,17 +20,29 @@ import {
   ListItemText,
   Typography,
 } from '@mui/material';
+import { FFColors, themeOptions } from '../../theme';
 
 interface Props {
   name: string;
   action: () => void;
   icon?: JSX.Element;
-  itemIsActive?: boolean;
+  itemIsActive: boolean;
 }
 
 export const NavItem = ({ name, action, icon, itemIsActive }: Props) => {
   return (
-    <ListItemButton onClick={action}>
+    <ListItemButton
+      onClick={action}
+      sx={{
+        borderLeft: 6,
+        borderLeftColor: itemIsActive
+          ? FFColors.Yellow
+          : themeOptions.palette?.background?.default,
+        backgroundColor: itemIsActive
+          ? 'background.paper'
+          : themeOptions.palette?.background?.default,
+      }}
+    >
       <ListItemIcon>{icon}</ListItemIcon>
       <ListItemText>
         <Typography>{name}</Typography>

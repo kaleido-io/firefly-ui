@@ -62,7 +62,7 @@ export const ActivityDashboard: () => JSX.Element = () => {
       <Header title={t('timeline')} subtitle={t('activity')}></Header>
       <Grid container px={DEFAULT_PADDING}>
         <Grid container item wrap="nowrap" direction="column">
-          {/* <ChartHeader
+          <ChartHeader
             title="All Activity"
             legend={legend}
             filter={
@@ -72,7 +72,7 @@ export const ActivityDashboard: () => JSX.Element = () => {
                 </Typography>
               </Button>
             }
-          /> */}
+          />
           <Histogram data="undefined"></Histogram>
           <TimelinePanel
             leftHeader="Submitted by Me"

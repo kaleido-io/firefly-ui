@@ -20,7 +20,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ApplicationContext } from '../../contexts/ApplicationContext';
 
 export const NamespacePicker: React.FC = () => {
-  const { namespace } = useParams();
+  const { namespace: routerNamespace } = useParams();
   const { selectedNamespace, setSelectedNamespace, namespaces } =
     useContext(ApplicationContext);
   const navigate = useNavigate();
@@ -29,11 +29,10 @@ export const NamespacePicker: React.FC = () => {
   const handleNamespaceSelect = (namespace: string) => {
     setSelectedNamespace(namespace);
     navigate(
-      pathname
-        .replace(`/namespace/${namespace}`, `/namespace/${namespace}`)
-        .split('/')
-        .slice(0, 4) // redirect to the moduleRoutePrefix for the module (/namespace/:namespace/MODULE)
-        .join('/')
+      pathname.replace(
+        `/namespaces/${routerNamespace}`,
+        `/namespaces/${namespace}`
+      )
     );
   };
 

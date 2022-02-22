@@ -21,7 +21,7 @@ import {
   Theme,
   ThemeProvider,
 } from '@mui/material';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ApplicationContext } from './contexts/ApplicationContext';
 import { SnackbarContext } from './contexts/SnackbarContext';
 import { Router } from './components/Router';
@@ -37,7 +37,8 @@ import {
   DataView,
   IStatus,
 } from './_core/interfaces';
-import { default as ReconnectingWebsocket } from 'reconnecting-websocket';
+import ReconnectingWebSocket from 'reconnecting-websocket';
+import { NAMESPACES_PATH } from './interfaces';
 
 //TODO: remove along with useStyles() usage
 declare module '@mui/styles/defaultTheme' {
@@ -50,9 +51,9 @@ const App: React.FC = () => {
   const [initialized, setInitialized] = useState(false);
   const [initError, setInitError] = useState<string | undefined>();
   const [namespaces, setNamespaces] = useState<INamespace[]>([]);
-  const [selectedNamespace, setSelectedNamespace] = useState<string>('');
+  const [selectedNamespace, setSelectedNamespace] = useState('');
   const [dataView, setDataView] = useState<DataView>('timeline');
-  const ws = useRef<ReconnectingWebsocket | null>(null);
+  const ws = useRef<ReconnectingWebSocket | null>(null);
   const [identity, setIdentity] = useState('');
   const [lastEvent, setLastEvent] = useState<any>();
   const [message, setMessage] = useState('');
@@ -61,6 +62,16 @@ const App: React.FC = () => {
   const [createdFilter, setCreatedFilter] =
     useState<CreatedFilterOptions>('24hours');
   const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+
+  const { pathname: currentPath } = useMemo(() => {
+    return window.location;
+  }, []);
+  const splitPath = currentPath.split('/');
+  const pathNamespaceIndex = splitPath.findIndex((p) => p === 'namespaces');
+  const routerNamespace =
+    splitPath.length >= pathNamespaceIndex + 1
+      ? splitPath[pathNamespaceIndex + 1]
+      : '';
 
   useEffect(() => {
     Promise.all([
@@ -73,8 +84,21 @@ const App: React.FC = () => {
           setIdentity(status.org.identity);
           setOrgName(status.org.name);
           setSelectedNamespace(status.defaults.namespace);
-          const namespaces: INamespace[] = await namespaceResponse.json();
-          setNamespaces(namespaces);
+          const ns: INamespace[] = await namespaceResponse.json();
+          setNamespaces(ns);
+
+          //ensure valid namespace in route
+          if (
+            routerNamespace &&
+            ns.find((option) => option.name === routerNamespace)
+          ) {
+            setSelectedNamespace(routerNamespace);
+          } else {
+            setSelectedNamespace(status.defaults.namespace);
+            window.location.replace(
+              `/${NAMESPACES_PATH}/${status.defaults.namespace}/home`
+            );
+          }
         } else {
           setInitError('true');
         }
@@ -82,18 +106,24 @@ const App: React.FC = () => {
       .finally(() => {
         setInitialized(true);
       });
-  }, []);
+  }, [routerNamespace]);
 
   useEffect(() => {
     if (selectedNamespace) {
-      ws.current = new ReconnectingWebsocket(
+      ws.current = new ReconnectingWebSocket(
         `${protocol}://${window.location.hostname}:${window.location.port}/ws?namespace=${selectedNamespace}&ephemeral&autoack`
       );
       ws.current.onmessage = (event: any) => {
         setLastEvent(event);
       };
+
+      return () => {
+        if (ws.current) {
+          ws.current.close();
+        }
+      };
     }
-  }, []);
+  }, [selectedNamespace]);
 
   const reportFetchError = (err: any) => {
     summarizeFetchError(err).then((message: string) => {

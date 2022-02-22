@@ -23,7 +23,6 @@ const RootDiv = styled('div')({
 export const AppWrapper: React.FC = () => {
   const { pathname } = useLocation();
   const { selectedNamespace } = useContext(ApplicationContext);
-
   if (pathname === '/') {
     return (
       <Navigate

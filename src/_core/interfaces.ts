@@ -38,12 +38,6 @@ export enum TXStatus {
   Error = 'Error',
 }
 
-export enum FFColors {
-  Blue = '#462DE0',
-  Yellow = '#FFCA00',
-  Red = '#FF0000',
-}
-
 export enum TransactionType {
   None = 'none',
   BatchPin = 'batch_pin',
@@ -51,10 +45,6 @@ export enum TransactionType {
   TokenTransfer = 'token_transfer',
   ContractInvoke = 'contract_invoke',
 }
-
-export type CreatedFilterOptions = '1hour' | '24hours' | '7days' | '30days';
-
-export type FilterOptions = CreatedFilterOptions;
 
 export interface IRoute {
   exact?: boolean;
@@ -79,10 +69,6 @@ export interface IStatus {
   };
 }
 
-export interface IDataTableColumn {
-  value: string | number | JSX.Element | undefined;
-}
-
 export interface IFilterItem {
   value: string;
   label: string;
@@ -102,12 +88,6 @@ export interface ITimelineItem {
   icon?: JSX.Element;
   time?: string;
   author?: string;
-  onClick?: () => void;
-}
-
-export interface IDataTableRecord {
-  columns: IDataTableColumn[];
-  key: string;
   onClick?: () => void;
 }
 
@@ -409,15 +389,6 @@ export interface IDataType {
   value: any;
 }
 
-export interface IEvent {
-  id: string;
-  sequence: number;
-  type: string;
-  namespace: string;
-  reference: string;
-  created: string;
-}
-
 export interface IOperation {
   id: string;
   namespace: string;
@@ -434,11 +405,6 @@ export interface IOperation {
   updated: string;
 }
 
-export interface ICreatedFilter {
-  filterString: string;
-  filterTime: number;
-}
-
 export interface IMetric {
   count: string;
   timestamp: string;
@@ -448,4 +414,9 @@ export interface IGenericPagedResponse {
   count: number;
   items: any[];
   total: number;
+}
+
+export interface IDataWithHeader {
+  header: string;
+  data: string | number;
 }

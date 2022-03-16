@@ -23,6 +23,7 @@ import { BlockchainRoutes } from '../pages/Blockchain/Routes';
 import { HomeRoutes } from '../pages/Home/Routes';
 import { MyNodeRoutes } from '../pages/MyNode/Routes';
 import { NetworkRoutes } from '../pages/Network/Routes';
+import { DataExchangeRoutes } from '../pages/DataExchange/Routes';
 import { OffChainRoutes } from '../pages/Off-Chain/Routes';
 import { TokensRoutes } from '../pages/Tokens/Routes';
 import { AppWrapper } from './AppWrapper';
@@ -66,6 +67,7 @@ export function getAllRoutes(): RouteObject[] {
     OffChainRoutes,
     TokensRoutes,
     NetworkRoutes,
+    DataExchangeRoutes,
     MyNodeRoutes,
   ];
 }

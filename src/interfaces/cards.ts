@@ -17,6 +17,7 @@
 export interface IDataWithHeader {
   header?: string;
   data: string | number | undefined | JSX.Element;
+  statusIcon?: 'success' | 'warning' | 'error';
 }
 
 export interface ISmallCard {

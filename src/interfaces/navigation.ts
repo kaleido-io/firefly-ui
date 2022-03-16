@@ -45,6 +45,9 @@ export const POOLS_PATH = 'pools';
 export const TOKENS_PATH = 'tokens';
 export const TRANSACTIONS_PATH = 'transactions';
 export const TRANSFERS_PATH = 'transfers';
+export const DATA_EXCHANGE_PATH = 'dx';
+export const DATA_EXCHANGE_MESSAGES_PATH = 'messages';
+export const DATA_EXCHANGE_BLOB_TRANSFERS_PATH = 'blobtransfers';
 
 export const FF_NAV_PATHS = {
   // Home
@@ -93,6 +96,13 @@ export const FF_NAV_PATHS = {
     `/${NAMESPACES_PATH}/${ns}/${NETWORK_PATH}/${ORGANIZATIONS_PATH}`,
   networkNodesPath: (ns: string) =>
     `/${NAMESPACES_PATH}/${ns}/${NETWORK_PATH}/${NODES_PATH}`,
+  // Data Exchange
+  dataExchangePath: (ns: string) =>
+    `/${NAMESPACES_PATH}/${ns}/${DATA_EXCHANGE_PATH}`,
+  dataExchangeMessagesPath: (ns: string) =>
+    `/${NAMESPACES_PATH}/${ns}/${DATA_EXCHANGE_PATH}/${DATA_EXCHANGE_MESSAGES_PATH}`,
+  dataExchangeBlobTransfersPath: (ns: string) =>
+    `/${NAMESPACES_PATH}/${ns}/${DATA_EXCHANGE_PATH}/${DATA_EXCHANGE_BLOB_TRANSFERS_PATH}`,
   // My Node
   myNodePath: (ns: string) => `/${NAMESPACES_PATH}/${ns}/${MY_NODES_PATH}`,
   // Docs

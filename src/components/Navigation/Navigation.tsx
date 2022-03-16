@@ -17,12 +17,13 @@ import { FF_NAV_PATHS } from '../../interfaces';
 import { MenuLogo } from '../MenuLogo';
 import { ActivityNav } from './ActivityNav';
 import { BlockchainNav } from './BlockchainNav';
+import { DXENav } from './DXNav';
 import { NavItem } from './NavItem';
 import { NetworkNav } from './NetworkNav';
 import { OffChainNav } from './OffChainNav';
 import { TokensNav } from './TokensNav';
 
-export const NAV_WIDTH = 225;
+export const NAV_WIDTH = 240;
 
 export const Navigation: React.FC = () => {
   const { orgName, selectedNamespace } = useContext(ApplicationContext);
@@ -43,6 +44,7 @@ export const Navigation: React.FC = () => {
       <OffChainNav />
       <TokensNav />
       <NetworkNav />
+      <DXENav />
       <NavItem
         name={t('myNode')}
         icon={<HexagonIcon />}

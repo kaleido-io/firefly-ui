@@ -3,6 +3,7 @@ import { Box } from '@mui/system';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { ISmallCard } from '../../interfaces';
+import CircleIcon from '@mui/icons-material/Circle';
 import { DEFAULT_BORDER_RADIUS, FFBackgroundHover } from '../../theme';
 
 type Props = {
@@ -74,12 +75,17 @@ export const SmallCard: React.FC<Props> = ({ card }) => {
               </Typography>
 
               {data.data !== undefined ? (
-                <Typography
-                  sx={{ fontSize: 24, fontWeight: 'bold' }}
-                  variant="subtitle1"
-                >
-                  {data.data}
-                </Typography>
+                <Grid item>
+                  {data.statusIcon === 'success' && (
+                    <CircleIcon style={{ color: '#598E29' }} />
+                  )}
+                  <Typography
+                    sx={{ fontSize: 24, fontWeight: 'bold' }}
+                    variant="subtitle1"
+                  >
+                    {data.data}
+                  </Typography>
+                </Grid>
               ) : (
                 <Skeleton sx={{ width: 40, height: 42 }} />
               )}

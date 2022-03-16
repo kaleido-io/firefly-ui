@@ -31,7 +31,6 @@ export const DXENav = () => {
   const dataExchangePath = FF_NAV_PATHS.dataExchangePath(selectedNamespace);
   const transfersPath = FF_NAV_PATHS.tokensTransfersPath(selectedNamespace);
   const poolsPath = FF_NAV_PATHS.tokensPoolsPath(selectedNamespace);
-  const accountsPath = FF_NAV_PATHS.tokensAccountsPath(selectedNamespace);
 
   const navItems: INavItem[] = [
     {
@@ -48,11 +47,6 @@ export const DXENav = () => {
       name: t('blobTransfers'),
       action: () => navigate(poolsPath),
       itemIsActive: pathname === poolsPath,
-    },
-    {
-      name: t('deadLetterQueue'),
-      action: () => navigate(accountsPath),
-      itemIsActive: pathname === accountsPath,
     },
   ];
 

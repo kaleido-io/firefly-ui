@@ -75,9 +75,19 @@ export const SmallCard: React.FC<Props> = ({ card }) => {
               </Typography>
 
               {data.data !== undefined ? (
-                <Grid item>
-                  {data.statusIcon === 'success' && (
-                    <CircleIcon style={{ color: '#598E29' }} />
+                <Grid item style={{ display: 'flex', alignItems: 'center' }}>
+                  {data.statusIcon && (
+                    <CircleIcon
+                      style={{
+                        color:
+                          data.statusIcon === 'success'
+                            ? '#598E29'
+                            : data.statusIcon === 'warning'
+                            ? '#EE8632'
+                            : '#CA2F2A',
+                        marginRight: '8px',
+                      }}
+                    />
                   )}
                   <Typography
                     sx={{ fontSize: 24, fontWeight: 'bold' }}

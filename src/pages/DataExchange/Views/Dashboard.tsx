@@ -55,12 +55,26 @@ export const DataExchangeDashboard: () => JSX.Element = () => {
         connectedClients === 0 ? 'disconnected' : 'connected'
       );
     });
+    invokeAPI(nodeID, 'status').then(({ producer, consumers }) => {
+      setProducerStatus(
+        producer.status === 'ready' ? 'connected' : producer.status
+      );
+      setMessageConsumerStatus(
+        consumers.messages.status === 'ready'
+          ? 'connected'
+          : consumers.messages.status
+      );
+      setBlobConsumerStatus(
+        consumers.blobs.status === 'ready'
+          ? 'connected'
+          : consumers.blobConsumer.status
+      );
+    });
   }, [nodeID]);
 
   const smallCards: ISmallCard[] = [
     {
       header: t('fireFlyWSClient'),
-      // numErrors: blockchainOpErrorCount,
       data: [
         {
           header: t('status'),
@@ -75,6 +89,7 @@ export const DataExchangeDashboard: () => JSX.Element = () => {
         {
           header: t('status'),
           data: producerStatus && t(producerStatus).toString(),
+          statusIcon: getStatusIcon(producerStatus),
         },
       ],
     },
@@ -84,6 +99,7 @@ export const DataExchangeDashboard: () => JSX.Element = () => {
         {
           header: t('status'),
           data: messageConsumerStatus && t(messageConsumerStatus).toString(),
+          statusIcon: getStatusIcon(messageConsumerStatus),
         },
       ],
       clickPath: FF_NAV_PATHS.dataExchangeMessagesPath(selectedNamespace),
@@ -94,9 +110,8 @@ export const DataExchangeDashboard: () => JSX.Element = () => {
         {
           header: t('status'),
           data: blobConsumerStatus && t(blobConsumerStatus).toString(),
+          statusIcon: getStatusIcon(blobConsumerStatus),
         },
-        { data: 'aaa' },
-        { data: undefined, header: 'pepe' },
       ],
       clickPath: FF_NAV_PATHS.dataExchangeBlobTransfersPath(selectedNamespace),
     },

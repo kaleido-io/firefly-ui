@@ -283,6 +283,7 @@
   "validator": "Validator",
   "value": "Value",
   "version": "Version",
+  "yourPeerID": "Your Peer ID",
   "yourNode": "Your Node",
   "yourOrg": "Your Org"
 }

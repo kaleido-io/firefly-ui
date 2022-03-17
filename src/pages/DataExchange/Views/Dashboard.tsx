@@ -1,27 +1,22 @@
 // Copyright © 2022 Kaleido, Inc.
 
-import { Grid, Typography } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import { Chip, Grid, Typography } from '@mui/material';
+import { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SmallCard } from '../../../components/Cards/SmallCard';
 import { Header } from '../../../components/Header';
 import { ChartTableHeader } from '../../../components/Headers/ChartTableHeader';
-import { FFTextField } from '../../../components/Inputs/FFTextField';
-import { FFCircleLoader } from '../../../components/Loaders/FFCircleLoader';
 import { HashPopover } from '../../../components/Popovers/HashPopover';
 import { DataTable } from '../../../components/Tables/Table';
 import { ApplicationContext } from '../../../contexts/ApplicationContext';
 import { SnackbarContext } from '../../../contexts/SnackbarContext';
+import BadgeIcon from '@mui/icons-material/Badge';
 import {
   FF_NAV_PATHS,
-  FF_Paths,
   IDataTableRecord,
-  INode,
-  IOrganization,
   ISmallCard,
 } from '../../../interfaces';
 import { DEFAULT_PADDING, DEFAULT_SPACING } from '../../../theme';
-import { fetchCatcher } from '../../../utils';
 import { invokeAPI } from '../dxComm';
 
 type baseComponentStatus = undefined | 'disconnected' | 'connected';
@@ -87,29 +82,70 @@ export const DataExchangeDashboard: () => JSX.Element = () => {
         setStorageBucketOrContainer(bucketOrContainer);
       }
     );
-    invokeAPI(nodeID, 'peers').then((peers) => {
-      console.log(peers);
-      const records: IDataTableRecord[] = [];
-      for (const peer of peers) {
-        records.push({
-          key: peer.id,
-          columns: [
-            { value: peer.id },
-            // {
-            //   value: <HashPopover address={peer.id} />,
-            // },
 
-            {
-              value: (
-                // <FFTextField label="" defaultValue={peer.cert} hasCopyBtn />
-                <HashPopover address={peer.cert} />
-              ),
-            },
-          ],
-        });
+    Promise.all([invokeAPI(nodeID, 'peers'), invokeAPI(nodeID, 'id')]).then(
+      ([peers, { id, cert }]) => {
+        const records: IDataTableRecord[] = [
+          {
+            key: id,
+            columns: [
+              {
+                value: (
+                  <>
+                    <Grid
+                      container
+                      justifyContent="flex-start"
+                      alignItems="center"
+                    >
+                      <BadgeIcon sx={{ color: '#FFFFFF' }} />
+                      <Typography pl={DEFAULT_PADDING} variant="body1">
+                        {id}
+                      </Typography>
+                    </Grid>
+                  </>
+                ),
+              },
+              {
+                value: <HashPopover address={cert} />,
+              },
+              {
+                value: <Chip color="success" label={t('yourPeerID')} />,
+              },
+            ],
+          },
+        ];
+        for (const peer of peers) {
+          records.push({
+            key: peer.id,
+            columns: [
+              {
+                value: (
+                  <>
+                    <Grid
+                      container
+                      justifyContent="flex-start"
+                      alignItems="center"
+                    >
+                      <BadgeIcon sx={{ color: '#FFFFFF' }} />
+                      <Typography pl={DEFAULT_PADDING} variant="body1">
+                        {peer.id}
+                      </Typography>
+                    </Grid>
+                  </>
+                ),
+              },
+              {
+                value: <HashPopover address={peer.cert} />,
+              },
+              {
+                value: '',
+              },
+            ],
+          });
+        }
+        setPeers(records);
       }
-      setPeers(records);
-    });
+    );
   }, [nodeID]);
 
   const smallCards: ISmallCard[] = [
@@ -233,7 +269,7 @@ export const DataExchangeDashboard: () => JSX.Element = () => {
             <ChartTableHeader title={t('peers')} />
             <DataTable
               stickyHeader={true}
-              columnHeaders={[t('id'), t('certificate')]}
+              columnHeaders={[t('id'), t('certificate'), '']}
               records={peers}
               emptyStateText={t('noPeersToDisplay')}
             />

@@ -94,7 +94,11 @@ export const HashPopover: React.FC<Props> = ({
           sx={{ padding: theme.spacing(1) }}
         >
           <Grid item>
-            <Typography>{address}</Typography>
+            {address.includes('\n') ? (
+              <pre style={{ fontFamily: 'monospace' }}>{address}</pre>
+            ) : (
+              <Typography>{address}</Typography>
+            )}
           </Grid>
           <Grid item>
             <CopyToClipboard text={address}>

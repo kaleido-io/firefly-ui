@@ -220,65 +220,57 @@ export const DataExchangeDashboard: React.FC = () => {
     <>
       <Header title={t('dashboard')} subtitle={t('dataExchange')}></Header>
       <Grid container px={DEFAULT_PADDING}>
+        {/* Small Cards */}
         <Grid
+          spacing={DEFAULT_SPACING}
           container
           item
-          direction="column"
-          justifyContent="center"
-          alignItems="flex-start"
+          direction="row"
+          pb={DEFAULT_PADDING}
         >
-          {/* Small Cards */}
-          <Grid
-            spacing={DEFAULT_SPACING}
-            container
-            item
-            direction="row"
-            pb={DEFAULT_PADDING}
-          >
-            {smallCards.map((card) => (
-              <Grid
-                key={card.header}
-                xs={DEFAULT_PADDING}
-                direction="column"
-                alignItems="center"
-                justifyContent="center"
-                container
-                item
-              >
-                <SmallCard card={card} />
-              </Grid>
-            ))}
-          </Grid>
-          {/* Storage Card */}
-          <Grid
-            spacing={DEFAULT_SPACING}
-            container
-            item
-            direction="row"
-            pb={DEFAULT_PADDING}
-          >
+          {smallCards.map((card) => (
             <Grid
-              key={storageCard.header}
-              xs={12}
+              key={card.header}
+              xs={DEFAULT_PADDING}
               direction="column"
               alignItems="center"
               justifyContent="center"
               container
               item
             >
-              <SmallCard card={storageCard} />
+              <SmallCard card={card} />
             </Grid>
+          ))}
+        </Grid>
+        {/* Storage Card */}
+        <Grid
+          spacing={DEFAULT_SPACING}
+          container
+          item
+          direction="row"
+          pb={DEFAULT_PADDING}
+        >
+          <Grid
+            key={storageCard.header}
+            xs={12}
+            direction="column"
+            alignItems="center"
+            justifyContent="center"
+            container
+            item
+          >
+            <SmallCard card={storageCard} />
           </Grid>
-          {/* Peer table */}
-          <Grid container item wrap="nowrap" direction="column">
-            <ChartTableHeader title={t('peers')} />
-            <DataTable
-              stickyHeader={true}
-              columnHeaders={[t('id'), t('certificate'), '']}
-              records={peers}
-              emptyStateText={t('noPeersToDisplay')}
-            />
-          </Grid>
+        </Grid>
+        {/* Peer table */}
+        <Grid container item wrap="nowrap" direction="column">
+          <ChartTableHeader title={t('peers')} />
+          <DataTable
+            stickyHeader={true}
+            columnHeaders={[t('id'), t('certificate'), '']}
+            records={peers}
+            emptyStateText={t('noPeersToDisplay')}
+          />
         </Grid>
       </Grid>
     </>

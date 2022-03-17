@@ -1,7 +1,7 @@
 import { RouteObject } from 'react-router-dom';
 import { NAMESPACES_PATH } from '../../interfaces';
 import { DataExchangeDashboard } from './Views/Dashboard';
-import { DataExchangeBrowser } from './Views/Browser';
+import { DataExchangeMessageBrowser } from './Views/MessageBrowser';
 
 export const DataExchangeRoutes: RouteObject = {
   path: `${NAMESPACES_PATH}/:namespace/dx`,
@@ -13,15 +13,15 @@ export const DataExchangeRoutes: RouteObject = {
     },
     {
       path: 'messages',
-      element: <DataExchangeBrowser prefix="msg" />,
+      element: <DataExchangeMessageBrowser prefix="msg" />,
     },
     {
       path: 'blobtransfers',
-      element: <DataExchangeBrowser prefix="blb" />,
+      element: <DataExchangeMessageBrowser prefix="blb" />,
     },
     {
       path: 'deadletterqueue',
-      element: <DataExchangeBrowser prefix="dlq" />,
+      element: <DataExchangeMessageBrowser prefix="dlq" />,
     },
   ],
 };

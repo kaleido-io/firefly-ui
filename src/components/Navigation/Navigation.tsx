@@ -17,7 +17,7 @@ import { FF_NAV_PATHS } from '../../interfaces';
 import { MenuLogo } from '../MenuLogo';
 import { ActivityNav } from './ActivityNav';
 import { BlockchainNav } from './BlockchainNav';
-import { DXENav } from './DXNav';
+import { DataExchangeNav } from './DataExchangeNav';
 import { NavItem } from './NavItem';
 import { NetworkNav } from './NetworkNav';
 import { OffChainNav } from './OffChainNav';
@@ -44,7 +44,7 @@ export const Navigation: React.FC = () => {
       <OffChainNav />
       <TokensNav />
       <NetworkNav />
-      <DXENav />
+      <DataExchangeNav />
       <NavItem
         name={t('myNode')}
         icon={<HexagonIcon />}

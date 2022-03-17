@@ -47,6 +47,7 @@ export const TRANSFERS_PATH = 'transfers';
 export const DATA_EXCHANGE_PATH = 'dx';
 export const DATA_EXCHANGE_MESSAGES_PATH = 'messages';
 export const DATA_EXCHANGE_BLOB_TRANSFERS_PATH = 'blobtransfers';
+export const DATA_EXCHANGE_DEAD_LETTER_QUEUE_PATH = 'deadletterqueue';
 
 export const FF_NAV_PATHS = {
   // Home
@@ -102,6 +103,8 @@ export const FF_NAV_PATHS = {
     `/${NAMESPACES_PATH}/${ns}/${DATA_EXCHANGE_PATH}/${DATA_EXCHANGE_MESSAGES_PATH}`,
   dataExchangeBlobTransfersPath: (ns: string) =>
     `/${NAMESPACES_PATH}/${ns}/${DATA_EXCHANGE_PATH}/${DATA_EXCHANGE_BLOB_TRANSFERS_PATH}`,
+  dataExchangeDeadLetterQueuePath: (ns: string) =>
+    `/${NAMESPACES_PATH}/${ns}/${DATA_EXCHANGE_PATH}/${DATA_EXCHANGE_DEAD_LETTER_QUEUE_PATH}`,
   // My Node
   myNodePath: (ns: string) => `/${NAMESPACES_PATH}/${ns}/${MY_NODES_PATH}`,
   // Docs

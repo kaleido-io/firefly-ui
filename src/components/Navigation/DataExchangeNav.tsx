@@ -22,15 +22,18 @@ import { ApplicationContext } from '../../contexts/ApplicationContext';
 import { FF_NAV_PATHS, INavItem } from '../../interfaces';
 import { NavSection } from './NavSection';
 
-export const DXENav = () => {
+export const DataExchangeNav = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { selectedNamespace } = useContext(ApplicationContext);
 
   const dataExchangePath = FF_NAV_PATHS.dataExchangePath(selectedNamespace);
-  const transfersPath = FF_NAV_PATHS.tokensTransfersPath(selectedNamespace);
-  const poolsPath = FF_NAV_PATHS.tokensPoolsPath(selectedNamespace);
+  const messagesPath = FF_NAV_PATHS.dataExchangeMessagesPath(selectedNamespace);
+  const blobTransferPath =
+    FF_NAV_PATHS.dataExchangeBlobTransfersPath(selectedNamespace);
+  const deadLetterQueuePath =
+    FF_NAV_PATHS.dataExchangeDeadLetterQueuePath(selectedNamespace);
 
   const navItems: INavItem[] = [
     {
@@ -40,13 +43,18 @@ export const DXENav = () => {
     },
     {
       name: t('messages'),
-      action: () => navigate(transfersPath),
-      itemIsActive: pathname === transfersPath,
+      action: () => navigate(messagesPath),
+      itemIsActive: pathname === messagesPath,
     },
     {
       name: t('blobTransfers'),
-      action: () => navigate(poolsPath),
-      itemIsActive: pathname === poolsPath,
+      action: () => navigate(blobTransferPath),
+      itemIsActive: pathname === blobTransferPath,
+    },
+    {
+      name: t('deadLetterQueue'),
+      action: () => navigate(deadLetterQueuePath),
+      itemIsActive: pathname === deadLetterQueuePath,
     },
   ];
 

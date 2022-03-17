@@ -34,7 +34,7 @@ const getStatusIcon = (status: extendedComponentStatus) => {
   }
 };
 
-export const DataExchangeDashboard: () => JSX.Element = () => {
+export const DataExchangeDashboard: React.FC = () => {
   const { nodeID, selectedNamespace } = useContext(ApplicationContext);
   const { reportFetchError } = useContext(SnackbarContext); // TODO
   const { t } = useTranslation();
@@ -55,36 +55,41 @@ export const DataExchangeDashboard: () => JSX.Element = () => {
   const [peers, setPeers] = useState<IDataTableRecord[]>([]);
 
   useEffect(() => {
-    invokeAPI(nodeID, 'clients').then(({ connectedClients }) => {
-      setffWsClientConnected(
-        connectedClients === 0 ? 'disconnected' : 'connected'
-      );
-    });
-    invokeAPI(nodeID, 'status').then(({ producer, consumers }) => {
-      setProducerStatus(
-        producer.status === 'ready' ? 'connected' : producer.status
-      );
-      setMessageConsumerStatus(
-        consumers.messages.status === 'ready'
-          ? 'connected'
-          : consumers.messages.status
-      );
-      setBlobConsumerStatus(
-        consumers.blobs.status === 'ready'
-          ? 'connected'
-          : consumers.blobConsumer.status
-      );
-    });
-    invokeAPI(nodeID, 'storage').then(
-      ({ provider, region, bucketOrContainer }) => {
+    invokeAPI(nodeID, 'clients')
+      .then(({ connectedClients }) => {
+        setffWsClientConnected(
+          connectedClients === 0 ? 'disconnected' : 'connected'
+        );
+      })
+      .catch((err) => reportFetchError(err));
+    invokeAPI(nodeID, 'status')
+      .then(({ producer, consumers }) => {
+        setProducerStatus(
+          producer.status === 'ready' ? 'connected' : producer.status
+        );
+        setMessageConsumerStatus(
+          consumers.messages.status === 'ready'
+            ? 'connected'
+            : consumers.messages.status
+        );
+        setBlobConsumerStatus(
+          consumers.blobs.status === 'ready'
+            ? 'connected'
+            : consumers.blobConsumer.status
+        );
+      })
+      .catch((err) => reportFetchError(err));
+
+    invokeAPI(nodeID, 'storage')
+      .then(({ provider, region, bucketOrContainer }) => {
         setStorageProvider(provider);
         setStorageRegion(region);
         setStorageBucketOrContainer(bucketOrContainer);
-      }
-    );
+      })
+      .catch((err) => reportFetchError(err));
 
-    Promise.all([invokeAPI(nodeID, 'peers'), invokeAPI(nodeID, 'id')]).then(
-      ([peers, { id, cert }]) => {
+    Promise.all([invokeAPI(nodeID, 'peers'), invokeAPI(nodeID, 'id')])
+      .then(([peers, { id, cert }]) => {
         const records: IDataTableRecord[] = [
           {
             key: id,
@@ -144,8 +149,8 @@ export const DataExchangeDashboard: () => JSX.Element = () => {
           });
         }
         setPeers(records);
-      }
-    );
+      })
+      .catch((err) => reportFetchError(err));
   }, [nodeID]);
 
   const smallCards: ISmallCard[] = [

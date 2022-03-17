@@ -15,6 +15,10 @@ export const invokeAPI = async (nodeID: string, apiPath: string) => {
   if (dxEndpoint === undefined) {
     dxEndpoint = await getDxEndpoint(nodeID);
   }
-  const res = await fetch(`${dxEndpoint}/api/v1/${apiPath}`);
+  const path = `${dxEndpoint}/api/v1/${apiPath}`;
+  const res = await fetch(path);
+  if (!res.ok) {
+    throw new Error(`${res.status} (${res.statusText}) ${path}`);
+  }
   return await res.json();
 };

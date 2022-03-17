@@ -36,7 +36,7 @@ const getStatusIcon = (status: extendedComponentStatus) => {
 
 export const DataExchangeDashboard: React.FC = () => {
   const { nodeID, selectedNamespace } = useContext(ApplicationContext);
-  const { reportFetchError } = useContext(SnackbarContext); // TODO
+  const { reportFetchError } = useContext(SnackbarContext);
   const { t } = useTranslation();
 
   const [ffWsClientStatus, setffWsClientConnected] =
@@ -75,7 +75,7 @@ export const DataExchangeDashboard: React.FC = () => {
         setBlobConsumerStatus(
           consumers.blobs.status === 'ready'
             ? 'connected'
-            : consumers.blobConsumer.status
+            : consumers.blobs.status
         );
       })
       .catch((err) => reportFetchError(err));

@@ -1,6 +1,13 @@
 // Copyright © 2022 Kaleido, Inc.
 
-import { Chip, Grid, Pagination, Typography } from '@mui/material';
+import {
+  Box,
+  Chip,
+  Grid,
+  LinearProgress,
+  Pagination,
+  Typography,
+} from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SmallCard } from '../../../components/Cards/SmallCard';
@@ -21,6 +28,7 @@ import {
 import { DEFAULT_PADDING, DEFAULT_SPACING, themeOptions } from '../../../theme';
 import { invokeAPI } from '../dxComm';
 import { FFJsonViewer } from '../../../components/Viewers/FFJsonViewer';
+import { minHeight } from '@mui/system';
 
 interface Props {
   prefix: 'msg' | 'blb' | 'dlq';
@@ -78,7 +86,6 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
         `browser/topics/${selectedTopic}/0/messages?offset=${offset - 1}`
       )
         .then((messages) => {
-          console.log(messages);
           if (messages.length > 0) {
             setMessage(messages[0]);
           }
@@ -196,8 +203,22 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
                 backgroundColor: themeOptions.palette?.background?.paper,
               }}
             >
-              <Grid item style={{ minHeight: '500px' }}>
-                {message?.message && <FFJsonViewer json={message} />}
+              <Grid item container style={{ minHeight: '500px' }}>
+                {message?.message && (
+                  <Grid
+                    item
+                    style={{
+                      overflow: 'hidden',
+                      opacity: fetchingMessage ? 0.5 : 1,
+                    }}
+                  >
+                    <Box style={{ paddingLeft: '40px', paddingBottom: '40px' }}>
+                      <FFJsonViewer
+                        json={message.message ?? message.rawMessage}
+                      />
+                    </Box>
+                  </Grid>
+                )}
               </Grid>
             </Grid>
           </>

@@ -29,7 +29,7 @@ type topic = {
 
 export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
   const { nodeID } = useContext(ApplicationContext);
-  const { reportFetchError } = useContext(SnackbarContext); // TODO
+  const { reportFetchError } = useContext(SnackbarContext);
   const { t } = useTranslation();
 
   const [topics, setTopics] = useState<topic[] | undefined>();
@@ -47,7 +47,7 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
       .then(async (topics: string[]) => {
         const processedTopics: topic[] = [];
         for (const topic of topics) {
-          if (topic.startsWith(`dx.${prefix}.`) || true) {
+          if (topic.startsWith(`dx.${prefix}.`)) {
             const offsets = await invokeAPI(
               nodeID,
               `browser/topics/${topic}/0`
@@ -120,7 +120,7 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
           { value: topic.offset },
         ],
         onClick: () => {
-          setMessage(undefined);
+          // setMessage(undefined);
           setSelectedTopic(topic.name);
           setOffset(topic.highWatermark);
         },
@@ -207,7 +207,7 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
               }}
             >
               <Grid item style={{ minHeight: '300px' }}>
-                {message.message && (
+                {message && (
                   <Grid
                     item
                     style={{

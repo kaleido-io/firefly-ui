@@ -1,6 +1,13 @@
 // Copyright © 2022 Kaleido, Inc.
 
-import { Box, Grid, Pagination, Typography } from '@mui/material';
+import {
+  Box,
+  Grid,
+  IconButton,
+  Pagination,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Header } from '../../../components/Header';
@@ -13,6 +20,7 @@ import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import { IDataTableRecord } from '../../../interfaces';
 import { DEFAULT_PADDING, themeOptions } from '../../../theme';
 import { invokeAPI } from '../dxComm';
+import GppGoodIcon from '@mui/icons-material/GppGood';
 import { FFCircleLoader } from '../../../components/Loaders/FFCircleLoader';
 import { FFJsonViewer } from '../../../components/Viewers/FFJsonViewer';
 
@@ -172,29 +180,47 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
             <Grid
               container
               item
-              justifyContent={'center'}
+              wrap="nowrap"
               style={{
                 borderRadius: '8px 8px 0 0',
+                padding: '20px 20px 10px 20px',
                 backgroundColor: themeOptions.palette?.background?.paper,
               }}
             >
               <Grid item>
-                <Pagination
-                  size="large"
-                  variant="outlined"
-                  disabled={fetchingMessage}
-                  count={
-                    topics?.find((topic) => topic.name === selectedTopic)
-                      ?.highWatermark ?? 1
-                  }
-                  style={{ paddingTop: '30px' }}
-                  showFirstButton
-                  showLastButton
-                  page={offset ?? 1}
-                  onChange={(_, value) => {
-                    setOffset(value);
+                <Typography
+                  sx={{
+                    fontWeight: 'bold',
                   }}
-                />
+                >
+                  {t('messages')}
+                </Typography>
+              </Grid>
+              <Grid item container justifyContent="center">
+                <Grid item>
+                  <Pagination
+                    size="large"
+                    variant="outlined"
+                    disabled={fetchingMessage}
+                    count={
+                      topics?.find((topic) => topic.name === selectedTopic)
+                        ?.highWatermark ?? 1
+                    }
+                    showFirstButton
+                    showLastButton
+                    page={offset ?? 1}
+                    onChange={(_, value) => {
+                      setOffset(value);
+                    }}
+                  />
+                </Grid>
+              </Grid>
+              <Grid item>
+                <Tooltip arrow title={t('signatureVerification').toString()}>
+                  <IconButton disabled={fetchingMessage}>
+                    <GppGoodIcon />
+                  </IconButton>
+                </Tooltip>
               </Grid>
             </Grid>
             <Grid
@@ -217,7 +243,11 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
                   >
                     <Box style={{ paddingLeft: '40px', paddingBottom: '40px' }}>
                       <FFJsonViewer
-                        json={message.message ?? message.rawMessage}
+                        json={
+                          message.message && typeof message.message !== 'string'
+                            ? message.message
+                            : message
+                        }
                       />
                     </Box>
                   </Grid>

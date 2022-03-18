@@ -235,7 +235,6 @@ export const DataExchangeDashboard: React.FC = () => {
               direction="column"
               alignItems="center"
               justifyContent="center"
-              container
               item
             >
               <SmallCard card={card} />
@@ -256,7 +255,6 @@ export const DataExchangeDashboard: React.FC = () => {
             direction="column"
             alignItems="center"
             justifyContent="center"
-            container
             item
           >
             <SmallCard card={storageCard} />
@@ -264,13 +262,15 @@ export const DataExchangeDashboard: React.FC = () => {
         </Grid>
         {/* Peer table */}
         <Grid container item wrap="nowrap" direction="column">
-          <ChartTableHeader title={t('peers')} />
-          <DataTable
-            stickyHeader={true}
-            columnHeaders={[t('id'), t('certificate'), '']}
-            records={peers}
-            emptyStateText={t('noPeersToDisplay')}
-          />
+          <Grid item>
+            <ChartTableHeader title={t('peers')} />
+            <DataTable
+              stickyHeader={true}
+              columnHeaders={[t('id'), t('certificate'), '']}
+              records={peers}
+              emptyStateText={t('noPeersToDisplay')}
+            />
+          </Grid>
         </Grid>
       </Grid>
     </>

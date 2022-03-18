@@ -1,34 +1,19 @@
 // Copyright © 2022 Kaleido, Inc.
 
-import {
-  Box,
-  Chip,
-  Grid,
-  LinearProgress,
-  Pagination,
-  Typography,
-} from '@mui/material';
+import { Box, Grid, Pagination, Typography } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SmallCard } from '../../../components/Cards/SmallCard';
 import { Header } from '../../../components/Header';
 import { ChartTableHeader } from '../../../components/Headers/ChartTableHeader';
-import { HashPopover } from '../../../components/Popovers/HashPopover';
 import { DataTable } from '../../../components/Tables/Table';
 import { ApplicationContext } from '../../../contexts/ApplicationContext';
 import { SnackbarContext } from '../../../contexts/SnackbarContext';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
-import BadgeIcon from '@mui/icons-material/Badge';
-import {
-  FF_NAV_PATHS,
-  IDataTableRecord,
-  ISmallCard,
-} from '../../../interfaces';
-import { DEFAULT_PADDING, DEFAULT_SPACING, themeOptions } from '../../../theme';
+import { IDataTableRecord } from '../../../interfaces';
+import { DEFAULT_PADDING, themeOptions } from '../../../theme';
 import { invokeAPI } from '../dxComm';
 import { FFJsonViewer } from '../../../components/Viewers/FFJsonViewer';
-import { minHeight } from '@mui/system';
 
 interface Props {
   prefix: 'msg' | 'blb' | 'dlq';
@@ -42,7 +27,7 @@ type topic = {
 };
 
 export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
-  const { nodeID, selectedNamespace } = useContext(ApplicationContext);
+  const { nodeID } = useContext(ApplicationContext);
   const { reportFetchError } = useContext(SnackbarContext); // TODO
   const { t } = useTranslation();
 
@@ -61,22 +46,27 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
       .then(async (topics: string[]) => {
         const processedTopics: topic[] = [];
         for (const topic of topics) {
-          const offsets = await invokeAPI(nodeID, `browser/topics/${topic}/0`);
-          processedTopics.push({
-            name: topic,
-            highWatermark: offsets.watermarks.highOffset,
-            lowWatermark: offsets.watermarks.lowOffset,
-            offset: offsets.offset,
-          });
+          if (topic.startsWith(`dx.${prefix}.`)) {
+            const offsets = await invokeAPI(
+              nodeID,
+              `browser/topics/${topic}/0`
+            );
+            processedTopics.push({
+              name: topic,
+              highWatermark: offsets.watermarks.highOffset,
+              lowWatermark: offsets.watermarks.lowOffset,
+              offset: offsets.offset,
+            });
+          }
         }
         if (processedTopics.length > 0) {
-          setSelectedTopic(processedTopics[0].name);
           setOffset(processedTopics[0].highWatermark);
+          setSelectedTopic(processedTopics[0].name);
         }
         setTopics(processedTopics);
       })
       .catch((err) => reportFetchError(err));
-  }, [nodeID]);
+  }, [nodeID, prefix]);
 
   useEffect(() => {
     if (selectedTopic && offset !== undefined) {
@@ -152,19 +142,23 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
           direction="column"
           pb={DEFAULT_PADDING}
         >
-          <ChartTableHeader title={t('topics')} />
-          <DataTable
-            stickyHeader={true}
-            columnHeaders={[
-              t('name'),
-              t('partition'),
-              t('lowWatermark'),
-              t('highWatermark'),
-              t('offset'),
-            ]}
-            records={records}
-            emptyStateText={t('noTopicsToDisplay')}
-          />
+          <Grid item>
+            <ChartTableHeader title={t('topics')} />
+          </Grid>
+          <Grid item>
+            <DataTable
+              stickyHeader={true}
+              columnHeaders={[
+                t('name'),
+                t('partition'),
+                t('lowWatermark'),
+                t('highWatermark'),
+                t('offset'),
+              ]}
+              records={records}
+              emptyStateText={t('noTopicsToDisplay')}
+            />
+          </Grid>
         </Grid>
         {selectedTopic && offset && (
           <>
@@ -173,6 +167,7 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
               item
               justifyContent={'center'}
               style={{
+                borderRadius: '8px 8px 0 0',
                 backgroundColor: themeOptions.palette?.background?.paper,
               }}
             >
@@ -195,15 +190,16 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
                 />
               </Grid>
             </Grid>
-
             <Grid
               item
               container
               style={{
                 backgroundColor: themeOptions.palette?.background?.paper,
+                marginBottom: '20px',
+                borderRadius: '0 0 8px 8px',
               }}
             >
-              <Grid item container style={{ minHeight: '500px' }}>
+              <Grid item style={{ minHeight: '300px' }}>
                 {message?.message && (
                   <Grid
                     item

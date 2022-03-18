@@ -13,6 +13,7 @@ import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import { IDataTableRecord } from '../../../interfaces';
 import { DEFAULT_PADDING, themeOptions } from '../../../theme';
 import { invokeAPI } from '../dxComm';
+import { FFCircleLoader } from '../../../components/Loaders/FFCircleLoader';
 import { FFJsonViewer } from '../../../components/Viewers/FFJsonViewer';
 
 interface Props {
@@ -46,7 +47,7 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
       .then(async (topics: string[]) => {
         const processedTopics: topic[] = [];
         for (const topic of topics) {
-          if (topic.startsWith(`dx.${prefix}.`)) {
+          if (topic.startsWith(`dx.${prefix}.`) || true) {
             const offsets = await invokeAPI(
               nodeID,
               `browser/topics/${topic}/0`
@@ -95,7 +96,12 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
           {
             value: (
               <>
-                <Grid container justifyContent="flex-start" alignItems="center">
+                <Grid
+                  container
+                  justifyContent="flex-start"
+                  alignItems="center"
+                  style={{ minHeight: '30px' }}
+                >
                   {selectedTopic === topic.name ? (
                     <RadioButtonCheckedIcon sx={{ color: '#FFFFFF' }} />
                   ) : (
@@ -114,6 +120,7 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
           { value: topic.offset },
         ],
         onClick: () => {
+          setMessage(undefined);
           setSelectedTopic(topic.name);
           setOffset(topic.highWatermark);
         },
@@ -160,7 +167,7 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
             />
           </Grid>
         </Grid>
-        {selectedTopic && offset && (
+        {message ? (
           <>
             <Grid
               container
@@ -200,7 +207,7 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
               }}
             >
               <Grid item style={{ minHeight: '300px' }}>
-                {message?.message && (
+                {message.message && (
                   <Grid
                     item
                     style={{
@@ -218,6 +225,8 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
               </Grid>
             </Grid>
           </>
+        ) : (
+          selectedTopic && <FFCircleLoader color="warning" />
         )}
       </Grid>
     </>

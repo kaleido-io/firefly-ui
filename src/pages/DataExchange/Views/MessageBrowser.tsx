@@ -47,7 +47,6 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
   const [selectedTopic, setSelectedTopic] = useState<string | undefined>();
   const [offset, setOffset] = useState<number | undefined>();
   const [message, setMessage] = useState<any>();
-  const [fetchingMessage, setFetchingMessage] = useState(false);
   const [signatureVerificationSlideOpen, setSignatureVerificationSlideOpen] =
     useState(false);
 
@@ -84,17 +83,14 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
 
   useEffect(() => {
     if (selectedTopic && offset !== undefined) {
-      setFetchingMessage(true);
       invokeAPI(
         nodeID,
         `browser/topics/${selectedTopic}/0/messages?offset=${offset - 1}`
-      )
-        .then((messages) => {
-          if (messages.length > 0) {
-            setMessage(messages[0]);
-          }
-        })
-        .finally(() => setFetchingMessage(false));
+      ).then((messages) => {
+        if (messages.length > 0) {
+          setMessage(messages[0]);
+        }
+      });
     }
   }, [selectedTopic, offset]);
 
@@ -159,42 +155,39 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
         )}
         subtitle={t('dataExchange')}
       ></Header>
-      <Grid container px={DEFAULT_PADDING}>
-        {/* Topics list */}
-        <Grid
-          container
-          item
-          wrap="nowrap"
-          direction="column"
-          pb={DEFAULT_PADDING}
-        >
-          <Grid item>
-            <ChartTableHeader title={t('topics')} />
-          </Grid>
-          <Grid item>
-            <DataTable
-              stickyHeader={true}
-              columnHeaders={[
-                t('name'),
-                t('partition'),
-                t('lowWatermark'),
-                t('highWatermark'),
-                t('offset'),
-              ]}
-              records={records}
-              emptyStateText={t('noTopicsToDisplay')}
-            />
-          </Grid>
+      <Grid
+        container
+        px={DEFAULT_PADDING}
+        spacing={3}
+        style={{ marginBottom: '32px' }}
+      >
+        <Grid item xs={12}>
+          <ChartTableHeader title={t('topics')} />
         </Grid>
-        {message ? (
-          <>
+        <Grid item xs={12}>
+          <DataTable
+            stickyHeader={true}
+            columnHeaders={[
+              t('name'),
+              t('partition'),
+              t('lowWatermark'),
+              t('highWatermark'),
+              t('offset'),
+            ]}
+            records={records}
+            emptyStateText={t('noTopicsToDisplay')}
+          />
+        </Grid>
+        {selectedTopic && offset !== undefined && (
+          <Grid item container>
             <Grid
-              container
+              p="10px 20px"
               item
+              container
               wrap="nowrap"
+              alignItems="center"
               style={{
                 borderRadius: '8px 8px 0 0',
-                padding: '20px 20px 10px 20px',
                 backgroundColor: themeOptions.palette?.background?.paper,
               }}
             >
@@ -212,7 +205,7 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
                   <Pagination
                     size="large"
                     variant="outlined"
-                    disabled={fetchingMessage}
+                    disabled={!message}
                     count={
                       topics?.find((topic) => topic.name === selectedTopic)
                         ?.highWatermark ?? 1
@@ -221,7 +214,10 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
                     showLastButton
                     page={offset ?? 1}
                     onChange={(_, value) => {
-                      setOffset(value);
+                      if (value !== offset) {
+                        setMessage(undefined);
+                        setOffset(value);
+                      }
                     }}
                   />
                 </Grid>
@@ -229,7 +225,7 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
               <Grid item>
                 <Tooltip arrow title={t('signatureVerification').toString()}>
                   <IconButton
-                    disabled={fetchingMessage}
+                    disabled={!message}
                     onClick={() => handleSignatureVerification()}
                   >
                     <GppGoodIcon />
@@ -240,39 +236,33 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
             <Grid
               item
               container
+              wrap="nowrap"
+              justifyContent={message ? 'left' : 'center'}
               style={{
-                backgroundColor: themeOptions.palette?.background?.paper,
-                marginBottom: '20px',
                 borderRadius: '0 0 8px 8px',
+                backgroundColor: themeOptions.palette?.background?.paper,
               }}
             >
-              <Grid item style={{ minHeight: '300px' }}>
-                {message && (
-                  <Grid
-                    item
-                    style={{
-                      overflow: 'hidden',
-                      opacity: fetchingMessage ? 0.5 : 1,
-                    }}
-                  >
-                    <Box style={{ paddingLeft: '40px', paddingBottom: '40px' }}>
-                      <FFJsonViewer
-                        json={
-                          message.message && typeof message.message !== 'string'
-                            ? message.message
-                            : message
-                        }
-                      />
-                    </Box>
-                  </Grid>
+              <Grid item style={{ minHeight: '500px' }}>
+                {message ? (
+                  <Box style={{ paddingLeft: '40px', paddingBottom: '20px' }}>
+                    <FFJsonViewer
+                      json={
+                        message.message && typeof message.message !== 'string'
+                          ? message.message
+                          : message
+                      }
+                    />
+                  </Box>
+                ) : (
+                  <FFCircleLoader color="warning" />
                 )}
               </Grid>
             </Grid>
-          </>
-        ) : (
-          selectedTopic && <FFCircleLoader color="warning" />
+          </Grid>
         )}
       </Grid>
+
       <DisplaySlide
         open={signatureVerificationSlideOpen}
         onClose={() => setSignatureVerificationSlideOpen(false)}

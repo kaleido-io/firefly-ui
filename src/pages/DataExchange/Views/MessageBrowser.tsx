@@ -234,20 +234,20 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
                 </Grid>
               </Grid>
               <Grid item>
-                <Tooltip arrow title={t('signatureVerification').toString()}>
-                  <IconButton
-                    disabled={
-                      !message ||
-                      !(
-                        message.message?.header ||
-                        message.message?.transferMetadata
-                      )
-                    }
-                    onClick={() => handleSignatureVerification()}
-                  >
+                <IconButton
+                  disabled={
+                    !message ||
+                    !(
+                      message.message?.header ||
+                      message.message?.transferMetadata
+                    )
+                  }
+                  onClick={() => handleSignatureVerification()}
+                >
+                  <Tooltip arrow title={t('signatureVerification').toString()}>
                     <GppGoodIcon />
-                  </IconButton>
-                </Tooltip>
+                  </Tooltip>
+                </IconButton>
               </Grid>
             </Grid>
             <Grid

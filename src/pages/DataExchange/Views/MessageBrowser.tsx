@@ -38,6 +38,8 @@ type topic = {
   offset?: number;
 };
 
+type peerEntry = { id: string; cert: string; self?: boolean };
+
 export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
   const { nodeID } = useContext(ApplicationContext);
   const { reportFetchError } = useContext(SnackbarContext);
@@ -47,8 +49,17 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
   const [selectedTopic, setSelectedTopic] = useState<string | undefined>();
   const [offset, setOffset] = useState<number | undefined>();
   const [message, setMessage] = useState<any>();
+  const [peers, setPeers] = useState<peerEntry[] | undefined>();
   const [signatureVerificationSlideOpen, setSignatureVerificationSlideOpen] =
     useState(false);
+
+  useEffect(() => {
+    invokeAPI(nodeID, 'peers?include_self')
+      .then((peers) => {
+        setPeers(peers);
+      })
+      .catch((err) => reportFetchError(err));
+  }, [nodeID]);
 
   useEffect(() => {
     setTopics(undefined);
@@ -96,7 +107,7 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
 
   let records: IDataTableRecord[] | undefined;
 
-  if (topics !== undefined) {
+  if (topics !== undefined && peers !== undefined) {
     records = [];
     for (const topic of topics) {
       records.push({
@@ -225,7 +236,13 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
               <Grid item>
                 <Tooltip arrow title={t('signatureVerification').toString()}>
                   <IconButton
-                    disabled={!message}
+                    disabled={
+                      !message ||
+                      !(
+                        message.message?.header ||
+                        message.message?.transferMetadata
+                      )
+                    }
                     onClick={() => handleSignatureVerification()}
                   >
                     <GppGoodIcon />
@@ -276,22 +293,43 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
           </Grid>
           <Grid item pb={DEFAULT_PADDING}>
             <FFTextField
-              defaultValue={JSON.stringify(message?.message?.header)}
+              defaultValue={JSON.stringify(
+                message?.message?.header ?? message?.message?.transferMetadata
+              )}
               label={t('header')}
               hasCopyBtn
             />
           </Grid>
           <Grid item pb={DEFAULT_PADDING}>
             <FFTextField
-              defaultValue={message?.message?.headerHash}
+              defaultValue={
+                message?.message?.headerHash ??
+                message?.message?.transferMetadataHash
+              }
               label={t('headerHash')}
               hasCopyBtn
             />
           </Grid>
           <Grid item pb={DEFAULT_PADDING}>
             <FFTextField
-              defaultValue={message?.message?.headerSignature}
+              defaultValue={
+                message?.message?.headerSignature ??
+                message?.message?.transferMetadataSignature
+              }
               label={t('signature')}
+              hasCopyBtn
+            />
+          </Grid>
+          <Grid item pb={DEFAULT_PADDING}>
+            <FFTextField
+              defaultValue={
+                peers?.find(
+                  (peer) =>
+                    peer.id === message?.message?.header?.sender ||
+                    peer.id === message?.message?.transferMetadata?.sender
+                )?.cert ?? ''
+              }
+              label={t('certificate')}
               hasCopyBtn
             />
           </Grid>

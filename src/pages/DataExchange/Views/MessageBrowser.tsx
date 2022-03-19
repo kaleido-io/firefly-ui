@@ -23,6 +23,9 @@ import { invokeAPI } from '../dxComm';
 import GppGoodIcon from '@mui/icons-material/GppGood';
 import { FFCircleLoader } from '../../../components/Loaders/FFCircleLoader';
 import { FFJsonViewer } from '../../../components/Viewers/FFJsonViewer';
+import { DisplaySlide } from '../../../components/Slides/DisplaySlide';
+import { SlideHeader } from '../../../components/Slides/SlideHeader';
+import { FFTextField } from '../../../components/Inputs/FFTextField';
 
 interface Props {
   prefix: 'msg' | 'blb' | 'dlq';
@@ -45,6 +48,8 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
   const [offset, setOffset] = useState<number | undefined>();
   const [message, setMessage] = useState<any>();
   const [fetchingMessage, setFetchingMessage] = useState(false);
+  const [signatureVerificationSlideOpen, setSignatureVerificationSlideOpen] =
+    useState(false);
 
   useEffect(() => {
     setTopics(undefined);
@@ -128,13 +133,19 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
           { value: topic.offset },
         ],
         onClick: () => {
-          // setMessage(undefined);
-          setSelectedTopic(topic.name);
-          setOffset(topic.highWatermark);
+          if (selectedTopic !== topic.name) {
+            setMessage(undefined);
+            setSelectedTopic(topic.name);
+            setOffset(topic.highWatermark);
+          }
         },
       });
     }
   }
+
+  const handleSignatureVerification = () => {
+    setSignatureVerificationSlideOpen(true);
+  };
 
   return (
     <>
@@ -217,7 +228,10 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
               </Grid>
               <Grid item>
                 <Tooltip arrow title={t('signatureVerification').toString()}>
-                  <IconButton disabled={fetchingMessage}>
+                  <IconButton
+                    disabled={fetchingMessage}
+                    onClick={() => handleSignatureVerification()}
+                  >
                     <GppGoodIcon />
                   </IconButton>
                 </Tooltip>
@@ -259,6 +273,40 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
           selectedTopic && <FFCircleLoader color="warning" />
         )}
       </Grid>
+      <DisplaySlide
+        open={signatureVerificationSlideOpen}
+        onClose={() => setSignatureVerificationSlideOpen(false)}
+      >
+        <Grid container direction="column" p={DEFAULT_PADDING}>
+          <Grid item pb={DEFAULT_PADDING}>
+            <SlideHeader
+              subtitle={t('message')}
+              title={t('signatureVerification')}
+            />
+          </Grid>
+          <Grid item pb={DEFAULT_PADDING}>
+            <FFTextField
+              defaultValue={JSON.stringify(message?.message?.header)}
+              label={t('header')}
+              hasCopyBtn
+            />
+          </Grid>
+          <Grid item pb={DEFAULT_PADDING}>
+            <FFTextField
+              defaultValue={message?.message?.headerHash}
+              label={t('headerHash')}
+              hasCopyBtn
+            />
+          </Grid>
+          <Grid item pb={DEFAULT_PADDING}>
+            <FFTextField
+              defaultValue={message?.message?.headerSignature}
+              label={t('signature')}
+              hasCopyBtn
+            />
+          </Grid>
+        </Grid>
+      </DisplaySlide>
     </>
   );
 };

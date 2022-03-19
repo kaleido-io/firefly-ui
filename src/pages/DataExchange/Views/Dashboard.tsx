@@ -16,15 +16,16 @@ import {
   IDataTableRecord,
   ISmallCard,
 } from '../../../interfaces';
-import { DEFAULT_PADDING, DEFAULT_SPACING } from '../../../theme';
+import { DEFAULT_PADDING } from '../../../theme';
 import { invokeAPI } from '../dxComm';
 
-type baseComponentStatus = undefined | 'disconnected' | 'connected';
+type baseComponentStatus = undefined | 'disconnected' | 'ready';
 type extendedComponentStatus = baseComponentStatus | 'connecting' | 'error';
+type peerEntry = { id: string; cert: string; self?: boolean };
 
 const getStatusIcon = (status: extendedComponentStatus) => {
   switch (status) {
-    case 'connected':
+    case 'ready':
       return 'success';
     case 'connecting':
       return 'warning';
@@ -52,31 +53,22 @@ export const DataExchangeDashboard: React.FC = () => {
   const [storageBucketOrContainer, setStorageBucketOrContainer] = useState<
     string | undefined
   >();
-  const [peers, setPeers] = useState<IDataTableRecord[]>([]);
+  const [peers, setPeers] = useState<peerEntry[] | undefined>();
 
   useEffect(() => {
     invokeAPI(nodeID, 'clients')
       .then(({ connectedClients }) => {
         setffWsClientConnected(
-          connectedClients === 0 ? 'disconnected' : 'connected'
+          connectedClients === 0 ? 'disconnected' : 'ready'
         );
       })
       .catch((err) => reportFetchError(err));
+
     invokeAPI(nodeID, 'status')
       .then(({ producer, consumers }) => {
-        setProducerStatus(
-          producer.status === 'ready' ? 'connected' : producer.status
-        );
-        setMessageConsumerStatus(
-          consumers.messages.status === 'ready'
-            ? 'connected'
-            : consumers.messages.status
-        );
-        setBlobConsumerStatus(
-          consumers.blobs.status === 'ready'
-            ? 'connected'
-            : consumers.blobs.status
-        );
+        setProducerStatus(producer.status);
+        setMessageConsumerStatus(consumers.messages.status);
+        setBlobConsumerStatus(consumers.blobs.status);
       })
       .catch((err) => reportFetchError(err));
 
@@ -88,70 +80,18 @@ export const DataExchangeDashboard: React.FC = () => {
       })
       .catch((err) => reportFetchError(err));
 
-    Promise.all([invokeAPI(nodeID, 'peers'), invokeAPI(nodeID, 'id')])
-      .then(([peers, { id, cert }]) => {
-        const records: IDataTableRecord[] = [
-          {
-            key: id,
-            columns: [
-              {
-                value: (
-                  <>
-                    <Grid
-                      container
-                      justifyContent="flex-start"
-                      alignItems="center"
-                    >
-                      <BadgeIcon sx={{ color: '#FFFFFF' }} />
-                      <Typography pl={DEFAULT_PADDING} variant="body1">
-                        {id}
-                      </Typography>
-                    </Grid>
-                  </>
-                ),
-              },
-              {
-                value: <HashPopover address={cert} />,
-              },
-              {
-                value: <Chip color="success" label={t('yourPeerID')} />,
-              },
-            ],
-          },
-        ];
-        for (const peer of peers) {
-          records.push({
-            key: peer.id,
-            columns: [
-              {
-                value: (
-                  <>
-                    <Grid
-                      container
-                      justifyContent="flex-start"
-                      alignItems="center"
-                    >
-                      <BadgeIcon sx={{ color: '#FFFFFF' }} />
-                      <Typography pl={DEFAULT_PADDING} variant="body1">
-                        {peer.id}
-                      </Typography>
-                    </Grid>
-                  </>
-                ),
-              },
-              {
-                value: <HashPopover address={peer.cert} />,
-              },
-              {
-                value: '',
-              },
-            ],
-          });
-        }
-        setPeers(records);
+    invokeAPI(nodeID, 'peers?include_self')
+      .then((peers) => {
+        setPeers(peers);
       })
       .catch((err) => reportFetchError(err));
   }, [nodeID]);
+
+  const getStatusLabel = (status: extendedComponentStatus) => {
+    if (status) {
+      return t(status === 'ready' ? 'connected' : status);
+    }
+  };
 
   const smallCards: ISmallCard[] = [
     {
@@ -159,7 +99,7 @@ export const DataExchangeDashboard: React.FC = () => {
       data: [
         {
           header: t('status'),
-          data: ffWsClientStatus && t(ffWsClientStatus).toString(),
+          data: getStatusLabel(ffWsClientStatus),
           statusIcon: getStatusIcon(ffWsClientStatus),
         },
       ],
@@ -169,7 +109,7 @@ export const DataExchangeDashboard: React.FC = () => {
       data: [
         {
           header: t('status'),
-          data: producerStatus && t(producerStatus).toString(),
+          data: getStatusLabel(producerStatus),
           statusIcon: getStatusIcon(producerStatus),
         },
       ],
@@ -179,7 +119,7 @@ export const DataExchangeDashboard: React.FC = () => {
       data: [
         {
           header: t('status'),
-          data: messageConsumerStatus && t(messageConsumerStatus).toString(),
+          data: getStatusLabel(messageConsumerStatus),
           statusIcon: getStatusIcon(messageConsumerStatus),
         },
       ],
@@ -216,61 +156,70 @@ export const DataExchangeDashboard: React.FC = () => {
     ],
   };
 
+  const peerRecords: IDataTableRecord[] | undefined = peers?.map(
+    ({ id, cert, self }) => ({
+      key: id,
+      columns: [
+        {
+          value: (
+            <>
+              <Grid container justifyContent="flex-start" alignItems="center">
+                <BadgeIcon sx={{ color: '#FFFFFF' }} />
+                <Typography pl={DEFAULT_PADDING} variant="body1">
+                  {id}
+                </Typography>
+              </Grid>
+            </>
+          ),
+        },
+        {
+          value: <HashPopover address={cert} />,
+        },
+        {
+          value: self ? <Chip color="success" label={t('yourPeerID')} /> : '',
+        },
+      ],
+    })
+  );
+
   return (
     <>
       <Header title={t('dashboard')} subtitle={t('dataExchange')}></Header>
-      <Grid container px={DEFAULT_PADDING}>
+      <Grid container px={DEFAULT_PADDING} spacing={3}>
         {/* Small Cards */}
-        <Grid
-          spacing={DEFAULT_SPACING}
-          container
-          item
-          direction="row"
-          pb={DEFAULT_PADDING}
-        >
-          {smallCards.map((card) => (
-            <Grid
-              key={card.header}
-              xs={DEFAULT_PADDING}
-              direction="column"
-              alignItems="center"
-              justifyContent="center"
-              item
-            >
-              <SmallCard card={card} />
-            </Grid>
-          ))}
-        </Grid>
-        {/* Storage Card */}
-        <Grid
-          spacing={DEFAULT_SPACING}
-          container
-          item
-          direction="row"
-          pb={DEFAULT_PADDING}
-        >
+        {smallCards.map((card) => (
           <Grid
-            key={storageCard.header}
-            xs={12}
+            key={card.header}
+            xs={3}
             direction="column"
             alignItems="center"
             justifyContent="center"
             item
           >
-            <SmallCard card={storageCard} />
+            <SmallCard card={card} />
           </Grid>
+        ))}
+        {/* Storage Card */}
+        <Grid
+          key={storageCard.header}
+          xs={12}
+          direction="column"
+          alignItems="center"
+          justifyContent="center"
+          pb={DEFAULT_PADDING}
+          item
+        >
+          <SmallCard card={storageCard} />
         </Grid>
         {/* Peer table */}
-        <Grid container item wrap="nowrap" direction="column">
-          <Grid item>
-            <ChartTableHeader title={t('peers')} />
-            <DataTable
-              stickyHeader={true}
-              columnHeaders={[t('id'), t('certificate'), '']}
-              records={peers}
-              emptyStateText={t('noPeersToDisplay')}
-            />
-          </Grid>
+        <Grid item xs={12}>
+          <ChartTableHeader title={t('peers')} />
+          <DataTable
+            stickyHeader={true}
+            columnHeaders={[t('id'), t('certificate'), '']}
+            records={peerRecords}
+            emptyStateText={t('noPeersToDisplay')}
+          />
         </Grid>
       </Grid>
     </>

@@ -130,7 +130,7 @@ export const DataExchangeDashboard: React.FC = () => {
       data: [
         {
           header: t('status'),
-          data: blobConsumerStatus && t(blobConsumerStatus).toString(),
+          data: getStatusLabel(blobConsumerStatus),
           statusIcon: getStatusIcon(blobConsumerStatus),
         },
       ],
@@ -191,7 +191,6 @@ export const DataExchangeDashboard: React.FC = () => {
           <Grid
             key={card.header}
             xs={3}
-            direction="column"
             alignItems="center"
             justifyContent="center"
             item
@@ -203,7 +202,6 @@ export const DataExchangeDashboard: React.FC = () => {
         <Grid
           key={storageCard.header}
           xs={12}
-          direction="column"
           alignItems="center"
           justifyContent="center"
           pb={DEFAULT_PADDING}

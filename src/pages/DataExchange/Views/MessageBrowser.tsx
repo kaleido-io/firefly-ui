@@ -18,7 +18,7 @@ import { SnackbarContext } from '../../../contexts/SnackbarContext';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import { IDataTableRecord } from '../../../interfaces';
-import { DEFAULT_PADDING, themeOptions } from '../../../theme';
+import { DEFAULT_PADDING, themeOptions, FFColors } from '../../../theme';
 import { invokeAPI } from '../dxComm';
 import GppGoodIcon from '@mui/icons-material/GppGood';
 import { FFCircleLoader } from '../../../components/Loaders/FFCircleLoader';
@@ -290,6 +290,23 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
               subtitle={t('message')}
               title={t('signatureVerification')}
             />
+          </Grid>
+          <Grid item pb={DEFAULT_PADDING}>
+            <Typography
+              style={{
+                wordSpacing: '4px',
+                color: FFColors.Orange,
+                textAlign: 'center',
+                fontWeight: 'bold',
+                backgroundColor: 'black',
+                borderRadius: '4px',
+                padding: '20px',
+              }}
+            >
+              {`${t('verify')} ( ${t('hash')} ( ${t('header')} ) , ${t(
+                'signature'
+              )} , ${t('certificate')} ) = ${t('ok')}`}
+            </Typography>
           </Grid>
           <Grid item pb={DEFAULT_PADDING}>
             <FFTextField

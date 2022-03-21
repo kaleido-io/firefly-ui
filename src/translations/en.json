@@ -105,7 +105,7 @@
   "hash": "Hash",
   "header": "Header",
   "headerHash": "Header Hash",
-  "highWaterMark": "High Watermark",
+  "highWatermark": "High Watermark",
   "id": "ID",
   "identity": "Identity",
   "identityConfirmed": "Identity Confirmed",

@@ -13,6 +13,7 @@ type Props = {
 export const SmallCard: React.FC<Props> = ({ card }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+
   return (
     <Box
       key={card.header}
@@ -41,6 +42,7 @@ export const SmallCard: React.FC<Props> = ({ card }) => {
             sx={{
               fontWeight: 'bold',
             }}
+            noWrap
           >
             {card.header}
           </Typography>
@@ -48,10 +50,18 @@ export const SmallCard: React.FC<Props> = ({ card }) => {
         {card.numErrors && card.numErrors > 0 ? (
           <Grid item>
             <Chip
+              onClick={(e) => {
+                e.stopPropagation();
+                card.errorLink ? navigate(card.errorLink) : undefined;
+              }}
               label={`${card.numErrors} ${t('failed')}`}
               color="error"
               size="small"
-              sx={{ fontSize: 10, fontWeight: 'bold' }}
+              sx={{
+                fontSize: 10,
+                fontWeight: 'bold',
+                cursor: 'pointer',
+              }}
             />
           </Grid>
         ) : (
@@ -68,6 +78,7 @@ export const SmallCard: React.FC<Props> = ({ card }) => {
           return (
             <Grid key={idx} item>
               <Typography
+                noWrap
                 sx={{ fontSize: 12, textTransform: 'uppercase' }}
                 variant="subtitle2"
               >
@@ -75,27 +86,13 @@ export const SmallCard: React.FC<Props> = ({ card }) => {
               </Typography>
 
               {data.data !== undefined ? (
-                <Grid item style={{ display: 'flex', alignItems: 'center' }}>
-                  {data.statusIcon && (
-                    <CircleIcon
-                      style={{
-                        color:
-                          data.statusIcon === 'success'
-                            ? '#598E29'
-                            : data.statusIcon === 'warning'
-                            ? '#EE8632'
-                            : '#CA2F2A',
-                        marginRight: '8px',
-                      }}
-                    />
-                  )}
-                  <Typography
-                    sx={{ fontSize: 24, fontWeight: 'bold' }}
-                    variant="subtitle1"
-                  >
-                    {data.data}
-                  </Typography>
-                </Grid>
+                <Typography
+                  noWrap
+                  sx={{ fontSize: 24, fontWeight: 'bold' }}
+                  variant="subtitle1"
+                >
+                  {data.data}
+                </Typography>
               ) : (
                 <Skeleton sx={{ width: 40, height: 42 }} />
               )}

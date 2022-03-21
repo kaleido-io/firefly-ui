@@ -313,7 +313,7 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
               defaultValue={JSON.stringify(
                 message?.message?.header ?? message?.message?.transferMetadata
               )}
-              label={t('header')}
+              label={t('headerJSON')}
               hasCopyBtn
             />
           </Grid>
@@ -323,7 +323,7 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
                 message?.message?.headerHash ??
                 message?.message?.transferMetadataHash
               }
-              label={t('headerHash')}
+              label={t('headerHashSHA256')}
               hasCopyBtn
             />
           </Grid>
@@ -333,7 +333,7 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
                 message?.message?.headerSignature ??
                 message?.message?.transferMetadataSignature
               }
-              label={t('signature')}
+              label={t('signatureBase64')}
               hasCopyBtn
             />
           </Grid>
@@ -346,7 +346,7 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
                     peer.id === message?.message?.transferMetadata?.sender
                 )?.cert ?? ''
               }
-              label={t('certificate')}
+              label={t('certificatePEM')}
               hasCopyBtn
             />
           </Grid>

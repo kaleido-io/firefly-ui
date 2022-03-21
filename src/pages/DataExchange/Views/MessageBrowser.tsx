@@ -150,101 +150,101 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
         {topicDetails && (
           <Grid item container>
             <Grid
-              p="10px 20px"
               item
               container
-              wrap="nowrap"
-              alignItems="center"
               style={{
-                borderRadius: '8px 8px 0 0',
+                borderRadius: '8px',
                 backgroundColor: themeOptions.palette?.background?.paper,
               }}
             >
-              <Grid item>
-                <Typography
-                  sx={{
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {t('messages')}
-                </Typography>
-              </Grid>
-              <Grid item container justifyContent="center">
+              <Grid
+                item
+                container
+                wrap="nowrap"
+                alignItems="center"
+                p="10px 20px"
+              >
                 <Grid item>
-                  <Pagination
-                    size="large"
-                    variant="outlined"
-                    disabled={!message}
-                    count={topicDetails.watermarks.highOffset}
-                    showFirstButton
-                    showLastButton
-                    page={index ?? 1}
-                    onChange={(_, value) => {
-                      if (value !== index) {
-                        setMessage(undefined); ///
-                        setIndex(value);
-                      }
+                  <Typography
+                    sx={{
+                      fontWeight: 'bold',
                     }}
-                  />
+                  >
+                    {t('messages')}
+                  </Typography>
                 </Grid>
-              </Grid>
-              <Grid item>
-                <IconButton
-                  disabled={
-                    !message ||
-                    !(
-                      message.message?.header ||
-                      message.message?.transferMetadata
-                    )
-                  }
-                  onClick={() => handleSignatureVerification()}
-                >
-                  <Tooltip arrow title={t('signatureVerification').toString()}>
-                    <GppGoodIcon />
-                  </Tooltip>
-                </IconButton>
-              </Grid>
-            </Grid>
-            <Grid
-              item
-              container
-              wrap="nowrap"
-              style={{
-                minHeight: '500px',
-                borderRadius: '0 0 8px 8px',
-                backgroundColor: themeOptions.palette?.background?.paper,
-              }}
-            >
-              {message ? (
-                <Grid item xs={12}>
-                  <Box px="40px" py="20px">
-                    <FFJsonViewer
-                      json={
-                        message.message &&
-                        typeof message.message !== 'string' &&
-                        !message.message.error
-                          ? message.message
-                          : message
-                      }
+                <Grid item container justifyContent="center">
+                  <Grid item>
+                    <Pagination
+                      size="large"
+                      variant="outlined"
+                      disabled={!message}
+                      count={topicDetails.watermarks.highOffset}
+                      showFirstButton
+                      showLastButton
+                      page={index ?? 1}
+                      onChange={(_, value) => {
+                        if (value !== index) {
+                          setMessage(undefined); ///
+                          setIndex(value);
+                        }
+                      }}
                     />
-                  </Box>
+                  </Grid>
                 </Grid>
-              ) : (
-                <Grid
-                  item
-                  xs={12}
-                  textAlign="center"
-                  alignSelf="center"
-                  pb="50px"
-                >
-                  <FFCircleLoader color="warning" />
+                <Grid item>
+                  <IconButton
+                    disabled={
+                      !message ||
+                      !(
+                        message.message?.header ||
+                        message.message?.transferMetadata
+                      )
+                    }
+                    onClick={() => handleSignatureVerification()}
+                  >
+                    <Tooltip
+                      arrow
+                      title={t('signatureVerification').toString()}
+                    >
+                      <GppGoodIcon />
+                    </Tooltip>
+                  </IconButton>
                 </Grid>
-              )}
+              </Grid>
+              <Grid
+                item
+                container
+                wrap="nowrap"
+                style={{
+                  minHeight: '500px',
+                }}
+                pb="60px"
+              >
+                {message ? (
+                  <Grid item xs={12}>
+                    <Box px="40px" py="20px">
+                      <FFJsonViewer
+                        json={
+                          message.message &&
+                          typeof message.message !== 'string' &&
+                          !message.message.error
+                            ? message.message
+                            : message
+                        }
+                      />
+                    </Box>
+                  </Grid>
+                ) : (
+                  <Grid item xs={12} textAlign="center" alignSelf="center">
+                    <FFCircleLoader color="warning" />
+                  </Grid>
+                )}
+              </Grid>
             </Grid>
           </Grid>
         )}
       </Grid>
-
       <DisplaySlide
         open={signatureVerificationSlideOpen}
         onClose={() => setSignatureVerificationSlideOpen(false)}

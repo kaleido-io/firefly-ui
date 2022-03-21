@@ -34,6 +34,7 @@ export const DataExchangeTopics: React.FC<Props> = ({ prefix }) => {
   const [topics, setTopics] = useState<Topic[]>();
 
   useEffect(() => {
+    setTopics(undefined);
     invokeAPI(nodeID, 'browser/topics')
       .then(async (topics: string[]) => {
         const processedTopics: Topic[] = [];

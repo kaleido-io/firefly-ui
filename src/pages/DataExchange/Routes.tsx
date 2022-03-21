@@ -25,8 +25,16 @@ export const DataExchangeRoutes: RouteObject = {
       element: <DataExchangeTopics prefix="blb" />,
     },
     {
+      path: 'blobtransfers/:topic/:partition',
+      element: <DataExchangeMessageBrowser prefix="msg" />,
+    },
+    {
       path: 'deadletterqueue',
       element: <DataExchangeTopics prefix="dlq" />,
+    },
+    {
+      path: 'deadletterqueue/:topic/:partition',
+      element: <DataExchangeMessageBrowser prefix="msg" />,
     },
   ],
 };

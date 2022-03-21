@@ -2,6 +2,7 @@ import { RouteObject } from 'react-router-dom';
 import { NAMESPACES_PATH } from '../../interfaces';
 import { DataExchangeDashboard } from './Views/Dashboard';
 import { DataExchangeMessageBrowser } from './Views/MessageBrowser';
+import { DataExchangeTopics } from './Views/Topics';
 
 export const DataExchangeRoutes: RouteObject = {
   path: `${NAMESPACES_PATH}/:namespace/dx`,
@@ -13,15 +14,19 @@ export const DataExchangeRoutes: RouteObject = {
     },
     {
       path: 'messages',
+      element: <DataExchangeTopics prefix="msg" />,
+    },
+    {
+      path: 'messages/:topic/:partition',
       element: <DataExchangeMessageBrowser prefix="msg" />,
     },
     {
       path: 'blobtransfers',
-      element: <DataExchangeMessageBrowser prefix="blb" />,
+      element: <DataExchangeTopics prefix="blb" />,
     },
     {
       path: 'deadletterqueue',
-      element: <DataExchangeMessageBrowser prefix="dlq" />,
+      element: <DataExchangeTopics prefix="dlq" />,
     },
   ],
 };

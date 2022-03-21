@@ -11,13 +11,9 @@ import {
 import { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Header } from '../../../components/Header';
-import { ChartTableHeader } from '../../../components/Headers/ChartTableHeader';
-import { DataTable } from '../../../components/Tables/Table';
 import { ApplicationContext } from '../../../contexts/ApplicationContext';
 import { SnackbarContext } from '../../../contexts/SnackbarContext';
-import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
-import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
-import { IDataTableRecord } from '../../../interfaces';
+import { ISmallCard } from '../../../interfaces';
 import { DEFAULT_PADDING, themeOptions, FFColors } from '../../../theme';
 import { invokeAPI } from '../dxComm';
 import GppGoodIcon from '@mui/icons-material/GppGood';
@@ -26,15 +22,19 @@ import { FFJsonViewer } from '../../../components/Viewers/FFJsonViewer';
 import { DisplaySlide } from '../../../components/Slides/DisplaySlide';
 import { SlideHeader } from '../../../components/Slides/SlideHeader';
 import { FFTextField } from '../../../components/Inputs/FFTextField';
+import { useParams } from 'react-router-dom';
+import { NumberParam, useQueryParam } from 'use-query-params';
+import { SmallCard } from '../../../components/Cards/SmallCard';
 
 interface Props {
   prefix: 'msg' | 'blb' | 'dlq';
 }
 
-type topic = {
-  name: string;
-  highWatermark: number;
-  lowWatermark: number;
+type TopicDetails = {
+  watermarks: {
+    lowOffset: number;
+    highOffset: number;
+  };
   offset?: number;
 };
 
@@ -45,11 +45,12 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
   const { reportFetchError } = useContext(SnackbarContext);
   const { t } = useTranslation();
 
-  const [topics, setTopics] = useState<topic[] | undefined>();
-  const [selectedTopic, setSelectedTopic] = useState<string | undefined>();
-  const [offset, setOffset] = useState<number | undefined>();
+  const { topic, partition } =
+    useParams<{ topic: string; partition: string }>();
+  const [index, setIndex] = useQueryParam('index', NumberParam);
+  const [topicDetails, setTopicDetails] = useState<TopicDetails>();
   const [message, setMessage] = useState<any>();
-  const [peers, setPeers] = useState<peerEntry[] | undefined>();
+  const [peers, setPeers] = useState<peerEntry[]>();
   const [signatureVerificationSlideOpen, setSignatureVerificationSlideOpen] =
     useState(false);
 
@@ -62,96 +63,60 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
   }, [nodeID]);
 
   useEffect(() => {
-    setTopics(undefined);
-    setSelectedTopic(undefined);
-    setOffset(undefined);
-    setMessage(undefined);
-    invokeAPI(nodeID, 'browser/topics')
-      .then(async (topics: string[]) => {
-        const processedTopics: topic[] = [];
-        for (const topic of topics) {
-          if (topic.startsWith(`dx.${prefix}.`)) {
-            const offsets = await invokeAPI(
-              nodeID,
-              `browser/topics/${topic}/0`
-            );
-            processedTopics.push({
-              name: topic,
-              highWatermark: offsets.watermarks.highOffset,
-              lowWatermark: offsets.watermarks.lowOffset,
-              offset: offsets.offset,
-            });
-          }
+    invokeAPI(nodeID, `browser/topics/${topic}/${partition}`)
+      .then(async (watermarks: TopicDetails) => {
+        if (
+          typeof index !== 'number' ||
+          index > watermarks.watermarks.highOffset
+        ) {
+          setIndex(watermarks.watermarks.highOffset);
         }
-        if (processedTopics.length > 0) {
-          setOffset(processedTopics[0].highWatermark);
-          setSelectedTopic(processedTopics[0].name);
-        }
-        setTopics(processedTopics);
+        setTopicDetails(watermarks);
       })
       .catch((err) => reportFetchError(err));
-  }, [nodeID, prefix]);
+  }, [topic, partition]);
 
   useEffect(() => {
-    if (selectedTopic && offset !== undefined) {
+    if (topicDetails) {
       invokeAPI(
         nodeID,
-        `browser/topics/${selectedTopic}/0/messages?offset=${offset - 1}`
-      ).then((messages) => {
-        if (messages.length > 0) {
-          setMessage(messages[0]);
-        }
-      });
-    }
-  }, [selectedTopic, offset]);
-
-  let records: IDataTableRecord[] | undefined;
-
-  if (topics !== undefined && peers !== undefined) {
-    records = [];
-    for (const topic of topics) {
-      records.push({
-        key: topic.name,
-        columns: [
-          {
-            value: (
-              <>
-                <Grid
-                  container
-                  justifyContent="flex-start"
-                  alignItems="center"
-                  style={{ minHeight: '30px' }}
-                >
-                  {selectedTopic === topic.name ? (
-                    <RadioButtonCheckedIcon sx={{ color: '#FFFFFF' }} />
-                  ) : (
-                    <RadioButtonUncheckedIcon sx={{ color: '#FFFFFF' }} />
-                  )}
-                  <Typography pl={DEFAULT_PADDING} variant="body1">
-                    {topic.name}
-                  </Typography>
-                </Grid>
-              </>
-            ),
-          },
-          { value: 0 },
-          { value: topic.lowWatermark },
-          { value: topic.highWatermark },
-          { value: topic.offset },
-        ],
-        onClick: () => {
-          if (selectedTopic !== topic.name) {
-            setMessage(undefined);
-            setSelectedTopic(topic.name);
-            setOffset(topic.highWatermark);
+        `browser/topics/${topic}/0/messages?offset=${
+          (index ?? topicDetails.watermarks.highOffset) - 1
+        }`
+      )
+        .then((messages) => {
+          if (messages.length > 0) {
+            setMessage(messages[0]);
           }
-        },
-      });
+        })
+        .catch((err) => reportFetchError(err));
     }
-  }
+  }, [topicDetails, index]);
 
   const handleSignatureVerification = () => {
     setSignatureVerificationSlideOpen(true);
+  };
+
+  const topicCard: ISmallCard = {
+    header: t('topic'),
+    data: [
+      {
+        header: t('name'),
+        data: topic,
+      },
+      {
+        header: t('lowWatermark'),
+        data: topicDetails?.watermarks.lowOffset,
+      },
+      {
+        header: t('highWatermark'),
+        data: topicDetails?.watermarks.highOffset,
+      },
+      {
+        header: t('offset'),
+        data: topicDetails?.offset,
+      },
+    ],
   };
 
   return (
@@ -172,24 +137,17 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
         spacing={3}
         style={{ marginBottom: '32px' }}
       >
-        <Grid item xs={12}>
-          <ChartTableHeader title={t('topics')} />
+        <Grid
+          key={topicCard.header}
+          xs={12}
+          alignItems="center"
+          justifyContent="center"
+          pb={DEFAULT_PADDING}
+          item
+        >
+          <SmallCard card={topicCard} />
         </Grid>
-        <Grid item xs={12}>
-          <DataTable
-            stickyHeader={true}
-            columnHeaders={[
-              t('name'),
-              t('partition'),
-              t('lowWatermark'),
-              t('highWatermark'),
-              t('offset'),
-            ]}
-            records={records}
-            emptyStateText={t('noTopicsToDisplay')}
-          />
-        </Grid>
-        {selectedTopic && offset !== undefined && (
+        {topicDetails && (
           <Grid item container>
             <Grid
               p="10px 20px"
@@ -217,17 +175,14 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
                     size="large"
                     variant="outlined"
                     disabled={!message}
-                    count={
-                      topics?.find((topic) => topic.name === selectedTopic)
-                        ?.highWatermark ?? 1
-                    }
+                    count={topicDetails.watermarks.highOffset}
                     showFirstButton
                     showLastButton
-                    page={offset ?? 1}
+                    page={index ?? 1}
                     onChange={(_, value) => {
-                      if (value !== offset) {
-                        setMessage(undefined);
-                        setOffset(value);
+                      if (value !== index) {
+                        setMessage(undefined); ///
+                        setIndex(value);
                       }
                     }}
                   />
@@ -254,15 +209,15 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
               item
               container
               wrap="nowrap"
-              justifyContent={message ? 'left' : 'center'}
               style={{
+                minHeight: '500px',
                 borderRadius: '0 0 8px 8px',
                 backgroundColor: themeOptions.palette?.background?.paper,
               }}
             >
-              <Grid item style={{ minHeight: '500px' }}>
-                {message ? (
-                  <Box style={{ paddingLeft: '40px', paddingBottom: '20px' }}>
+              {message ? (
+                <Grid item xs={12}>
+                  <Box px="40px" py="20px">
                     <FFJsonViewer
                       json={
                         message.message &&
@@ -273,10 +228,18 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
                       }
                     />
                   </Box>
-                ) : (
+                </Grid>
+              ) : (
+                <Grid
+                  item
+                  xs={12}
+                  textAlign="center"
+                  alignSelf="center"
+                  pb="50px"
+                >
                   <FFCircleLoader color="warning" />
-                )}
-              </Grid>
+                </Grid>
+              )}
             </Grid>
           </Grid>
         )}

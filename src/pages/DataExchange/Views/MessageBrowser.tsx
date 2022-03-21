@@ -265,7 +265,9 @@ export const DataExchangeMessageBrowser: React.FC<Props> = ({ prefix }) => {
                   <Box style={{ paddingLeft: '40px', paddingBottom: '20px' }}>
                     <FFJsonViewer
                       json={
-                        message.message && typeof message.message !== 'string'
+                        message.message &&
+                        typeof message.message !== 'string' &&
+                        !message.message.error
                           ? message.message
                           : message
                       }

@@ -72,8 +72,19 @@ export const MessageAccordion: React.FC<Props> = ({
             rightContent={
               message.state && (
                 <Chip
-                  label={message.state?.toLocaleUpperCase()}
-                  sx={{ backgroundColor: MsgStateColorMap[message.state] }}
+                  label={
+                    message.state?.toLocaleUpperCase() === 'PENDING'
+                      ? 'CONFIRMED'
+                      : message.state?.toLocaleUpperCase()
+                  }
+                  sx={{
+                    backgroundColor:
+                      MsgStateColorMap[
+                        message.state === 'pending'
+                          ? 'confirmed'
+                          : message.state
+                      ],
+                  }}
                 ></Chip>
               )
             }

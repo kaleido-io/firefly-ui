@@ -169,9 +169,11 @@ export const FF_EVENTS_CATEGORY_MAP: {
     enrichedEventString: (event: IEvent): string =>
       event.transaction?.blockchainIds?.length === 1
         ? `BlockchainID=${getShortHash(event.transaction?.blockchainIds[0])}`
-        : `BlockchainIDs=[${event.transaction?.blockchainIds
+        : event.transaction?.blockchainIds
+        ? `BlockchainIDs=[${event.transaction?.blockchainIds
             ?.map((bid) => getShortHash(bid))
-            .join(', ')}]`,
+            .join(', ')}]`
+        : t('transactionSubmitted'),
   },
   // Token Events
   [FF_EVENTS.TOKEN_POOL_CONFIRMED]: {

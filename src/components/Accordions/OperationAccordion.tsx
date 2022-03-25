@@ -58,8 +58,17 @@ export const OperationAccordion: React.FC<Props> = ({ op, isOpen = false }) => {
           }
           rightContent={
             <Chip
-              label={op.status?.toLocaleUpperCase()}
-              sx={{ backgroundColor: OpStatusColorMap[op.status] }}
+              label={
+                op.status?.toLocaleUpperCase() === 'PENDING'
+                  ? 'SUCCEEDED'
+                  : op.status?.toLocaleUpperCase()
+              }
+              sx={{
+                backgroundColor:
+                  OpStatusColorMap[
+                    op.status === 'Pending' ? 'Succeeded' : op.status
+                  ],
+              }}
             ></Chip>
           }
         />

@@ -4,12 +4,14 @@ import {
   AccordionDetails,
   AccordionSummary,
   Grid,
+  Typography,
 } from '@mui/material';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IBlockchainEvent, IDataWithHeader } from '../../interfaces';
 import { getFFTime } from '../../utils';
 import { HashPopover } from '../Popovers/HashPopover';
+import { FFJsonViewer } from '../Viewers/FFJsonViewer';
 import { FFAccordionHeader } from './FFAccordionHeader';
 import { FFAccordionText } from './FFAccordionText';
 
@@ -75,6 +77,18 @@ export const BlockchainEventAccordion: React.FC<Props> = ({
             </Grid>
           ))}
         </Grid>
+        {be.info && (
+          <Grid container item direction="row">
+            <Typography>Info</Typography>
+            <FFJsonViewer json={be.info} />
+          </Grid>
+        )}
+        {be.output && (
+          <Grid container item direction="row">
+            <Typography>Output</Typography>
+            <FFJsonViewer json={be.output} />
+          </Grid>
+        )}
       </AccordionDetails>
     </Accordion>
   );
